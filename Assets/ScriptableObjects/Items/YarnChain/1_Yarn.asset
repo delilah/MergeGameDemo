@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
+  m_Name: 1_Yarn
+  m_EditorClassIdentifier: 
+  itemName: Yarn Ball
+  level: 0
+  sprite: {fileID: 21300000, guid: fcd8f5073b08de149956948bd781d40a, type: 3}
+  nextItem: {fileID: 11400000, guid: 1401af45f1a7a6341ba0691002c024ad, type: 2}
+  isFinal: 0
