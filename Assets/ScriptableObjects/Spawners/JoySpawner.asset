@@ -17,4 +17,4 @@ MonoBehaviour:
   spawnableItems:
   - {fileID: 11400000, guid: 416087cfda2cdcb4b86988b2cac5812d, type: 2}
   - {fileID: 11400000, guid: 5fd6b1e5a2fc22c4789b1b72223f1edf, type: 2}
-  spawnCooldown: 2
+  spawnCooldown: 0.2

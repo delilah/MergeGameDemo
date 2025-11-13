@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     {
         _gridManager.GenerateGrid();
         PlaceTestSpawner();
-        PlaceTestItems();
+        // PlaceTestItems();
     }
 
 private void PlaceTestSpawner()
