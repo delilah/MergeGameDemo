@@ -98,11 +98,6 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         }
     }
 
-    // public void OnPointerDown(PointerEventData eventData)
-    // {
-    //     Debug.Log($"Item clicked: {name}");
-    // }
-
     public void OnPointerDown(PointerEventData eventData)
 {
     // using isFinal to check if the item is final

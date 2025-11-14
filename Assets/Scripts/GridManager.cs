@@ -167,6 +167,7 @@ public class GridManager : MonoBehaviour
             return item;
         }
 
+        // if pool has no objects, create a new one
         if (_itemsParent == null)
         {
             _itemsParent = new GameObject("Items");
