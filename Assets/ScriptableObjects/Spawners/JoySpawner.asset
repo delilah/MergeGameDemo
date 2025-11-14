@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: JoySpawner
   m_EditorClassIdentifier: 
   spawnerName: Joy Spawner
-  sprite: {fileID: 21300000, guid: ab56452a5f4cc2740841e8cbee16c27e, type: 3}
+  sprite: {fileID: 21300000, guid: 3f3edcbbd79d42a49b9b498304cb2ba7, type: 3}
   spawnableItems:
   - {fileID: 11400000, guid: 416087cfda2cdcb4b86988b2cac5812d, type: 2}
   - {fileID: 11400000, guid: 5fd6b1e5a2fc22c4789b1b72223f1edf, type: 2}
+  - {fileID: 11400000, guid: 9602b718f127b354b973eff5b70d9c5a, type: 2}
+  - {fileID: 11400000, guid: 79f8a8ab2015bbd428a6475d749eb870, type: 2}
   spawnCooldown: 0.2
