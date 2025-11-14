@@ -13,6 +13,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
     private Tile _tile;
     private float _nextAvailableTime = 0f;
+    private List<MergeItemData> _spawnableCandidates = new List<MergeItemData>();
 
     private static Spawner _active;
 
@@ -22,6 +23,23 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         if (_spriteRenderer != null && spawnerData != null && spawnerData.sprite != null)
         {
             _spriteRenderer.sprite = spawnerData.sprite;
+        }
+
+        PrecomputeSpawnableCandidates();
+    }
+
+    private void PrecomputeSpawnableCandidates()
+    {
+        _spawnableCandidates.Clear();
+        if (spawnerData != null && spawnerData.spawnableItems != null)
+        {
+            for (int i = 0; i < spawnerData.spawnableItems.Length; i++)
+            {
+                if (spawnerData.spawnableItems[i] != null)
+                {
+                    _spawnableCandidates.Add(spawnerData.spawnableItems[i]);
+                }
+            }
         }
     }
 
@@ -91,51 +109,31 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             return;
         }
 
-        if (_gridManager == null || _gridManager.Tiles == null)
+        if (_gridManager == null)
         {
             Debug.Log("GridManager not ready; cannot spawn.");
             return;
         }
 
-        // Validate spawn list
-        List<MergeItemData> candidates = new List<MergeItemData>();
-        if (spawnerData.spawnableItems != null)
-        {
-            for (int i = 0; i < spawnerData.spawnableItems.Length; i++)
-            {
-                if (spawnerData.spawnableItems[i] != null)
-                    candidates.Add(spawnerData.spawnableItems[i]);
-            }
-        }
-        if (candidates.Count == 0)
+        if (_spawnableCandidates.Count == 0)
         {
             Debug.Log("Spawner has no valid spawnable items.");
             return;
         }
 
-        // Collect free tiles (no item and no spawner)
-        List<System.Collections.Generic.KeyValuePair<UnityEngine.Vector2Int, Tile>> free = new List<System.Collections.Generic.KeyValuePair<UnityEngine.Vector2Int, Tile>>();
-        foreach (var kvp in _gridManager.Tiles)
-        {
-            Tile t = kvp.Value;
-            if (t != null && !t.HasItem() && !t.HasSpawner())
-            {
-                free.Add(kvp);
-            }
-        }
-
-        if (free.Count == 0)
+        IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
+        if (freeTiles.Count == 0)
         {
             Debug.Log("no available tiles");
             return;
         }
 
         // Pick random item and tile
-        int itemIdx = Random.Range(0, candidates.Count);
-        MergeItemData itemData = candidates[itemIdx];
+        int itemIdx = Random.Range(0, _spawnableCandidates.Count);
+        MergeItemData itemData = _spawnableCandidates[itemIdx];
 
-        int tileIdx = Random.Range(0, free.Count);
-        Vector2Int gridPos = free[tileIdx].Key;
+        int tileIdx = Random.Range(0, freeTiles.Count);
+        Vector2Int gridPos = freeTiles[tileIdx];
 
         // Spawn via GridManager
         Debug.Log($"Spawning {itemData.name} at {gridPos}");

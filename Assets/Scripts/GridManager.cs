@@ -20,8 +20,10 @@ public class GridManager : MonoBehaviour
     private GameObject _tilesParent;
     private Stack<Tile> _tilePool = new Stack<Tile>();
     private const string TILES_PARENT_NAME = "Tiles";
+    private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
 
     public Dictionary<Vector2Int, Tile> Tiles => _tiles;
+    public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
 
     public void GenerateGrid()
     {
@@ -76,7 +78,10 @@ public class GridManager : MonoBehaviour
                 tile.gameObject.name = $"Tile {x} {y}";
 #endif
 
-                _tiles[new Vector2Int(x, y)] = tile;
+                Vector2Int gridPos = new Vector2Int(x, y);
+                _tiles[gridPos] = tile;
+                tile.SetGridPosition(gridPos, this);
+                _freeTilePositions.Add(gridPos);
             }
         }
 
@@ -149,5 +154,18 @@ public class GridManager : MonoBehaviour
         Item newItem = Instantiate(_itemPrefab);        // Instantiate prefab
         newItem.Initialize(data, tile);                 // Set data and tile
         return newItem;
+    }
+
+    public void MarkTileOccupied(Vector2Int gridPos)
+    {
+        _freeTilePositions.Remove(gridPos);
+    }
+
+    public void MarkTileFree(Vector2Int gridPos)
+    {
+        if (!_freeTilePositions.Contains(gridPos))
+        {
+            _freeTilePositions.Add(gridPos);
+        }
     }
 }

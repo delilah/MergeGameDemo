@@ -16,6 +16,8 @@ public class Tile : MonoBehaviour
     private Item _currentItem;
     private Spawner _currentSpawner;
     private const float _spritePadding = .95f; // 1: aspect ratio tile, 1.5: tile has a bigger transparent bg so we enlarge it to show it fully in the tile
+    private Vector2Int _gridPosition;
+    private GridManager _gridManager;
 
 
     public bool HasItem() => _currentItem != null;
@@ -28,6 +30,12 @@ public class Tile : MonoBehaviour
     public void Init(bool isAlternateTile)
     {
         _renderer.color = isAlternateTile ? _offsetColor : _baseColor;
+    }
+
+    public void SetGridPosition(Vector2Int gridPos, GridManager gridManager)
+    {
+        _gridPosition = gridPos;
+        _gridManager = gridManager;
     }
 
     public void SetHighlight(bool on)
@@ -58,6 +66,11 @@ public class Tile : MonoBehaviour
         spawner.SetTile(this);
         AdjustSortingAboveTile(spawner.GetComponent<SpriteRenderer>());
 
+        if (_gridManager != null)
+        {
+            _gridManager.MarkTileOccupied(_gridPosition);
+        }
+
         Debug.Log($"Spawner {spawner.name} placed at local position {spawner.transform.localPosition}");
     }
 
@@ -68,6 +81,11 @@ public class Tile : MonoBehaviour
 
         PlaceObject(item.transform, new Vector3(0, 0.05f, 0));
         AdjustSortingAboveTile(item.GetComponent<SpriteRenderer>());
+
+        if (_gridManager != null)
+        {
+            _gridManager.MarkTileOccupied(_gridPosition);
+        }
     }
 
     private void PlaceObject(Transform objTransform, Vector3 localOffset)
@@ -106,7 +124,13 @@ public class Tile : MonoBehaviour
     public void RemoveItem()
     {
         _currentItem = null;
+        if (_gridManager != null && !HasSpawner())
+        {
+            _gridManager.MarkTileFree(_gridPosition);
+        }
     }
+
+    public Vector2Int GridPosition => _gridPosition;
 
 
 }
