@@ -98,10 +98,28 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         }
     }
 
+    // public void OnPointerDown(PointerEventData eventData)
+    // {
+    //     Debug.Log($"Item clicked: {name}");
+    // }
+
     public void OnPointerDown(PointerEventData eventData)
+{
+    // using isFinal to check if the item is final
+    bool isFinal = _data != null && _data.isFinal;
+    // // using nextItem to check if the item is final
+    // bool isFinal = _data != null && _data.nextItem == null;
+
+    if (isFinal)
     {
-        Debug.Log($"Item clicked: {name}");
+        Debug.Log($"FINAL item clicked: {name} (Data: {_data.name})");
+        // collect cat
     }
+    else
+    {
+        Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem.name})");
+    }
+}
 
     public void OnPickUp()
     {
