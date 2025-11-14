@@ -30,6 +30,11 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
             EnsureColliderSized();
         }
 
+        if (_spriteRenderer != null)
+        {
+            _spriteRenderer.sortingOrder = _originalSortingOrder;
+        }
+
         SetTile(tile);
     }
 
@@ -187,8 +192,8 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         // Clear original tile
         _currentTile?.RemoveItem();
 
-        // Destroy dragged item, TODO evaluate pooling?
-        Destroy(this.gameObject);
+        // Return dragged item to pool
+        ReturnToPool();
 
         // Merge into next in the chain
         if (targetItem.Data.nextItem != null)
@@ -199,6 +204,20 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         {
             // Already final level, keep as is
             targetItem.SetTile(targetTile);
+        }
+    }
+
+    private void ReturnToPool()
+    {
+        ClearTile();
+        
+        if (_gridManager != null)
+        {
+            _gridManager.ReturnItemToPool(this);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 }

@@ -18,9 +18,11 @@ public class GridManager : MonoBehaviour
 
     private Dictionary<Vector2Int, Tile> _tiles;
     private GameObject _tilesParent;
-    private Stack<Tile> _tilePool = new Stack<Tile>();
+    private Stack<Tile> _tilePool = new Stack<Tile>(); // pooling
     private const string TILES_PARENT_NAME = "Tiles";
     private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
+    private Stack<Item> _itemPool = new Stack<Item>(); //pooling
+    private GameObject _itemsParent;
 
     public Dictionary<Vector2Int, Tile> Tiles => _tiles;
     public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
@@ -151,9 +153,35 @@ public class GridManager : MonoBehaviour
             return null;
         }
 
-        Item newItem = Instantiate(_itemPrefab);        // Instantiate prefab
-        newItem.Initialize(data, tile);                 // Set data and tile
+        Item newItem = GetItemFromPool();
+        newItem.Initialize(data, tile);
         return newItem;
+    }
+
+    private Item GetItemFromPool()
+    {
+        if (_itemPool.Count > 0)
+        {
+            Item item = _itemPool.Pop();
+            item.gameObject.SetActive(true);
+            return item;
+        }
+
+        if (_itemsParent == null)
+        {
+            _itemsParent = new GameObject("Items");
+        }
+
+        return Instantiate(_itemPrefab, _itemsParent.transform);
+    }
+
+    public void ReturnItemToPool(Item item)
+    {
+        if (item == null) return;
+
+        item.gameObject.SetActive(false);
+        item.transform.SetParent(_itemsParent != null ? _itemsParent.transform : transform);
+        _itemPool.Push(item);
     }
 
     public void MarkTileOccupied(Vector2Int gridPos)
