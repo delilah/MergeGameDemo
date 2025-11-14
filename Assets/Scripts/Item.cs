@@ -23,13 +23,14 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     public void Initialize(MergeItemData data, Tile tile)
     {
         _data = data;
-        SetTile(tile);
 
         if (_spriteRenderer != null && _data.sprite != null)
         {
             _spriteRenderer.sprite = _data.sprite;
             EnsureColliderSized();
         }
+
+        SetTile(tile);
     }
 
     /// <summary>

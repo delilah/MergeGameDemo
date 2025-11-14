@@ -15,7 +15,7 @@ public class Tile : MonoBehaviour
 
     private Item _currentItem;
     private Spawner _currentSpawner;
-    private const float _spritePadding = 1.5f; // 1: aspect ratio tile, 1.5: tile has a bigger transparent bg so we enlarge it to show it fully in the tile
+    private const float _spritePadding = .95f; // 1: aspect ratio tile, 1.5: tile has a bigger transparent bg so we enlarge it to show it fully in the tile
 
 
     public bool HasItem() => _currentItem != null;
@@ -66,7 +66,8 @@ public class Tile : MonoBehaviour
         _currentItem = item;
         if (item == null) return;
 
-        PlaceObject(item.transform, new Vector3(0, 0.05f, 0)); // Added slight Y offset
+        PlaceObject(item.transform, new Vector3(0, 0.05f, 0));
+        AdjustSortingAboveTile(item.GetComponent<SpriteRenderer>());
     }
 
     private void PlaceObject(Transform objTransform, Vector3 localOffset)
