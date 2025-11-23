@@ -2,10 +2,22 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+    
     [SerializeField] private GridManager _gridManager;
     [SerializeField] private Spawner _spawnerPrefab; // generic prefab
     [SerializeField] private SpawnerData _testSpawnerData;
     [SerializeField] private MergeItemData[] _testItems; // ScriptableObjects for items
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     void Start()
     {

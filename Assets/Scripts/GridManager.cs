@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    public static GridManager Instance { get; private set; }
+
     [Header("Grid Settings")]
     [SerializeField] private int _width = 6;
     [SerializeField] private int _height = 6;
@@ -26,6 +28,16 @@ public class GridManager : MonoBehaviour
 
     public Dictionary<Vector2Int, Tile> Tiles => _tiles;
     public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     public void GenerateGrid()
     {

@@ -99,22 +99,33 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     }
 
     public void OnPointerDown(PointerEventData eventData)
-{
-    // using isFinal to check if the item is final
-    bool isFinal = _data != null && _data.isFinal;
-    // // using nextItem to check if the item is final
-    // bool isFinal = _data != null && _data.nextItem == null;
+    {
+        // using isFinal to check if the item is final
+        bool isFinal = _data != null && _data.isFinal;
 
-    if (isFinal)
-    {
-        Debug.Log($"FINAL item clicked: {name} (Data: {_data.name})");
-        // collect cat
+        // I can also choose to use nextItem to check if the item is final - or a combo of both? What's less error prone for a designer?
+        // bool isFinal = _data != null && _data.nextItem == null;
+
+        if (isFinal)
+        {
+            if (CollectionManager.Instance != null)
+            {
+                CollectionManager.Instance.Collect(_data);
+            }
+
+            // TODO: Add some visual effect, like a DoTween in and out?
+            // TODO: Add some audio effect
+            Debug.Log($"{_data.itemName} collected!");
+
+            
+            
+            ReturnToPool(); // Remove item from grid/pool after collection
+        }
+        else
+        {
+            Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
+        }
     }
-    else
-    {
-        Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem.name})");
-    }
-}
 
     public void OnPickUp()
     {

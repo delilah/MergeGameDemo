@@ -51,6 +51,11 @@ public class Tile : MonoBehaviour
         Debug.Log($"[Tile] SetHighlight({on}) on {name} | before={before} after={after}");
     }
 
+    // public void SetRenderer(SpriteRenderer renderer)
+    // {
+    //     _renderer = renderer;
+    // }
+
     public void PlaceSpawner(Spawner spawner)
     {
         _currentSpawner = spawner;

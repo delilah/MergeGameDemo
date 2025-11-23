@@ -9,7 +9,8 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     [Header("References")]
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Collider2D _collider;
-    [SerializeField] private GridManager _gridManager;
+    
+    private GridManager _gridManager;
 
     private Tile _tile;
     private float _nextAvailableTime = 0f;
@@ -53,7 +54,9 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             // Ensure a collider exists on this object for pointer events
             _collider = gameObject.AddComponent<BoxCollider2D>();
         }
-        if (_gridManager == null) _gridManager = FindObjectOfType<GridManager>();
+        
+        // Use singleton instead of FindObjectOfType
+        _gridManager = GridManager.Instance;
         _tile = GetComponentInParent<Tile>();
 
         EnsureColliderSized();
@@ -99,7 +102,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     {
         if (spawnerData == null)
         {
-            Debug.Log("SpawnerData is null; cannot spawn.");
+            Debug.LogWarning("SpawnerData is null; cannot spawn.");
             return;
         }
 
@@ -111,20 +114,20 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
         if (_gridManager == null)
         {
-            Debug.Log("GridManager not ready; cannot spawn.");
+            Debug.LogWarning("GridManager not ready; cannot spawn.");
             return;
         }
 
         if (_spawnableCandidates.Count == 0)
         {
-            Debug.Log("Spawner has no valid spawnable items.");
+            Debug.LogWarning("Spawner has no valid spawnable items.");
             return;
         }
 
         IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
         if (freeTiles.Count == 0)
         {
-            Debug.Log("no available tiles");
+            Debug.Log("No available tiles");
             return;
         }
 
