@@ -21,37 +21,42 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        _gridManager.GenerateGrid();
+        if (!_gridManager.GenerateGrid())
+        {
+            Debug.LogError("Failed to generate grid. Aborting game start.");
+            return;
+        }
         PlaceTestSpawner();
         // PlaceTestItems();
     }
 
-private void PlaceTestSpawner()
-{
-    Vector2Int pos = new Vector2Int(3, 3);
-    Tile tile = _gridManager.GetTileAtPosition(pos);
 
-    if (tile == null)
+    private void PlaceTestSpawner()
     {
-        Debug.LogWarning("Tile 3,3 does not exist!");
-        return;
+        Vector2Int pos = new Vector2Int(3, 3);
+        Tile tile = _gridManager.GetTileAtPosition(pos);
+
+        if (tile == null)
+        {
+            Debug.LogWarning("Tile 3,3 does not exist!");
+            return;
+        }
+
+        Debug.Log($"Tile 3,3 found. HasItem={tile.HasItem()}, HasSpawner={tile.HasSpawner()}, IsEmpty={tile.IsEmpty}");
+
+        if (!tile.IsEmpty)
+        {
+            Debug.LogWarning("Tile 3,3 is occupied!");
+            return;
+        }
+
+        Spawner spawner = Instantiate(_spawnerPrefab);
+        spawner.Initialize(_testSpawnerData);
+
+        tile.PlaceSpawner(spawner);
+
+        Debug.Log($"Spawner placed on Tile 3,3 at position {spawner.transform.position}");
     }
-
-    Debug.Log($"Tile 3,3 found. HasItem={tile.HasItem()}, HasSpawner={tile.HasSpawner()}, IsEmpty={tile.IsEmpty}");
-
-    if (!tile.IsEmpty)
-    {
-        Debug.LogWarning("Tile 3,3 is occupied!");
-        return;
-    }
-
-    Spawner spawner = Instantiate(_spawnerPrefab);
-    spawner.Initialize(_testSpawnerData);
-
-    tile.PlaceSpawner(spawner);
-
-    Debug.Log($"Spawner placed on Tile 3,3 at position {spawner.transform.position}");
-}
 
 
     private void PlaceTestItems()
