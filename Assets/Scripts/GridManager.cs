@@ -27,6 +27,9 @@ public class GridManager : MonoBehaviour
     private Stack<Item> _itemPool = new Stack<Item>(); //pooling
     private GameObject _itemsParent;
 
+    private float _tileSize;
+    private Vector2 _startPos;
+
     public Dictionary<Vector2Int, Tile> Tiles => _tiles;
     public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
 
@@ -43,18 +46,24 @@ public class GridManager : MonoBehaviour
         _itemsParent = new GameObject(ITEMS_PARENT_NAME);
     }
 
-    public void GenerateGrid()
+    public bool GenerateGrid()
     {
+
+        Camera mainCam = Camera.main;
+        if (mainCam == null)
+        {
+            Debug.LogError("No MainCamera found. Make sure your camera is tagged as MainCamera");
+            return false;
+        }
+
         if (_tilePrefab == null)
         {
             Debug.LogWarning("No tilePrefab assigned!");
-            return;
+            return false;
         }
 
         if (_tiles == null) _tiles = new Dictionary<Vector2Int, Tile>();
         else _tiles.Clear();
-
-        // if (_tilesParent == null) _tilesParent = new GameObject(TILES_PARENT_NAME);
 
         // clear free positions to avoid duplicates on regeneration
         _freeTilePositions.Clear();
@@ -70,8 +79,6 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        Camera mainCam = Camera.main ?? Camera.current;
-
         float screenHeight = mainCam.orthographicSize * 2f;
         float screenWidth = screenHeight * mainCam.aspect;
 
@@ -83,6 +90,10 @@ public class GridManager : MonoBehaviour
         float gridHeight = _height * tileSize;
         Vector2 startPos = new Vector2(-gridWidth * 0.5f + tileSize * 0.5f,
                                        -gridHeight * 0.5f + tileSize * 0.5f);
+
+        _tileSize = tileSize;
+        _startPos = startPos;
+
 
         Vector3 tileScale = new Vector3(tileSize, tileSize, 1f);
 
@@ -112,6 +123,8 @@ public class GridManager : MonoBehaviour
                                            startPos.y + (gridHeight - tileSize) * 0.5f,
                                            _camera.position.z);
         }
+
+        return true;
     }
 
     private Tile GetOrCreateTile()
@@ -136,18 +149,12 @@ public class GridManager : MonoBehaviour
 
     public Tile GetTileAtWorldPosition(Vector3 worldPos)
     {
-        foreach (Tile tile in _tiles.Values)
-        {
-            Vector3 pos = tile.transform.position;
-            float halfSize = tile.transform.localScale.x * 0.5f;
+        if (_tileSize <= 0f) return null;
 
-            if (worldPos.x >= pos.x - halfSize && worldPos.x <= pos.x + halfSize &&
-                worldPos.y >= pos.y - halfSize && worldPos.y <= pos.y + halfSize)
-            {
-                return tile;
-            }
-        }
-        return null;
+        int x = Mathf.RoundToInt((worldPos.x - _startPos.x) / _tileSize);
+        int y = Mathf.RoundToInt((worldPos.y - _startPos.y) / _tileSize);
+
+        return GetTileAtPosition(new Vector2Int(x, y));
     }
 
     // ---------- SPAWN ITEM ----------
@@ -186,14 +193,7 @@ public class GridManager : MonoBehaviour
             return item;
         }
 
-        // // if pool has no objects, create a new one -- MOVED TO AWAKE
-        // if (_itemsParent == null)
-        // {
-        //     _itemsParent = new GameObject("Items");
-        // }
-
         Debug.Assert(_itemsParent != null, "ItemsParent is null — was Awake called?");
-
 
         return Instantiate(_itemPrefab, _itemsParent.transform);
     }
