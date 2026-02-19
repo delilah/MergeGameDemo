@@ -22,6 +22,7 @@ public class GridManager : MonoBehaviour
     private GameObject _tilesParent;
     private Stack<Tile> _tilePool = new Stack<Tile>(); // pooling
     private const string TILES_PARENT_NAME = "Tiles";
+    private const string ITEMS_PARENT_NAME = "Items";
     private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
     private Stack<Item> _itemPool = new Stack<Item>(); //pooling
     private GameObject _itemsParent;
@@ -37,6 +38,9 @@ public class GridManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        _tilesParent = new GameObject(TILES_PARENT_NAME);
+        _itemsParent = new GameObject(ITEMS_PARENT_NAME);
     }
 
     public void GenerateGrid()
@@ -50,7 +54,10 @@ public class GridManager : MonoBehaviour
         if (_tiles == null) _tiles = new Dictionary<Vector2Int, Tile>();
         else _tiles.Clear();
 
-        if (_tilesParent == null) _tilesParent = new GameObject(TILES_PARENT_NAME);
+        // if (_tilesParent == null) _tilesParent = new GameObject(TILES_PARENT_NAME);
+
+        // clear free positions to avoid duplicates on regeneration
+        _freeTilePositions.Clear();
 
         // Pool existing tiles
         foreach (Transform child in _tilesParent.transform)
@@ -179,11 +186,14 @@ public class GridManager : MonoBehaviour
             return item;
         }
 
-        // if pool has no objects, create a new one
-        if (_itemsParent == null)
-        {
-            _itemsParent = new GameObject("Items");
-        }
+        // // if pool has no objects, create a new one -- MOVED TO AWAKE
+        // if (_itemsParent == null)
+        // {
+        //     _itemsParent = new GameObject("Items");
+        // }
+
+        Debug.Assert(_itemsParent != null, "ItemsParent is null — was Awake called?");
+
 
         return Instantiate(_itemPrefab, _itemsParent.transform);
     }
