@@ -1,7 +1,6 @@
-// A tile is a cell, a square of the grid. 
+// A tile is a cell, a square of the grid.
 // Tile has colour and is free or occupied.
 // Objects on a tile are Items. They are draggable.
-
 
 using UnityEngine;
 
@@ -15,17 +14,17 @@ public class Tile : MonoBehaviour
 
     private Item _currentItem;
     private Spawner _currentSpawner;
-    private const float _spritePadding = .95f; // 1: aspect ratio tile, 1.5: tile has a bigger transparent bg so we enlarge it to show it fully in the tile
+    private const float _spritePadding = .95f;
     private Vector2Int _gridPosition;
     private GridManager _gridManager;
-
 
     public bool HasItem() => _currentItem != null;
     public Item GetItem() => _currentItem;
     public bool HasSpawner() => _currentSpawner != null;
     public Spawner GetSpawner() => _currentSpawner;
 
-    public bool IsEmpty => _currentSpawner == null;
+    // True only when the tile has no item AND no spawner on it.
+    public bool IsEmpty => _currentSpawner == null && _currentItem == null;
 
     public void Init(bool isAlternateTile)
     {
@@ -40,34 +39,21 @@ public class Tile : MonoBehaviour
 
     public void SetHighlight(bool on)
     {
-        if (_highlight == null)
-        {
-            Debug.Log($"[Tile] SetHighlight called but _highlight is null on {name}");
-            return;
-        }
-        bool before = _highlight.activeSelf;
+        if (_highlight == null) return;
         _highlight.SetActive(on);
-        bool after = _highlight.activeSelf;
-        Debug.Log($"[Tile] SetHighlight({on}) on {name} | before={before} after={after}");
     }
-
-    // public void SetRenderer(SpriteRenderer renderer)
-    // {
-    //     _renderer = renderer;
-    // }
 
     public void PlaceSpawner(Spawner spawner)
     {
-        _currentSpawner = spawner;
         if (spawner == null)
         {
-            Debug.Log("Spawner is null, cannot place.");
+            Debug.LogWarning("Spawner is null, cannot place.");
             return;
         }
 
-        PlaceObject(spawner.transform, Vector3.zero);
+        _currentSpawner = spawner;
 
-        // Spawner-specific logic as we need the tile for the highlight
+        PlaceObject(spawner.transform, Vector3.zero);
         spawner.SetTile(this);
         AdjustSortingAboveTile(spawner.GetComponent<SpriteRenderer>());
 
@@ -75,12 +61,12 @@ public class Tile : MonoBehaviour
         {
             _gridManager.MarkTileOccupied(_gridPosition);
         }
-
-        Debug.Log($"Spawner {spawner.name} placed at local position {spawner.transform.localPosition}");
     }
 
     public void PlaceItem(Item item)
     {
+        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name} — was SetGridPosition called?");
+
         _currentItem = item;
         if (item == null) return;
 
@@ -93,11 +79,23 @@ public class Tile : MonoBehaviour
         }
     }
 
+    public void RemoveItem()
+    {
+        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name} — was SetGridPosition called?");
+
+        _currentItem = null;
+
+        // Only mark free if there's no spawner occupying this tile
+        if (_gridManager != null && !HasSpawner())
+        {
+            _gridManager.MarkTileFree(_gridPosition);
+        }
+    }
+
     private void PlaceObject(Transform objTransform, Vector3 localOffset)
     {
         objTransform.SetParent(transform);
         objTransform.localPosition = localOffset;
-
         ScaleToTile(objTransform);
     }
 
@@ -108,8 +106,7 @@ public class Tile : MonoBehaviour
         float tileSize = transform.localScale.x;
 
         SpriteRenderer sr = objTransform.GetComponent<SpriteRenderer>();
-        if (sr == null || sr.sprite == null)
-            return;
+        if (sr == null || sr.sprite == null) return;
 
         Vector2 spriteSize = sr.sprite.bounds.size;
         float targetSize = tileSize * _spritePadding;
@@ -123,19 +120,8 @@ public class Tile : MonoBehaviour
         if (sr == null) return;
 
         sr.sortingLayerID = _renderer.sortingLayerID;
-        sr.sortingOrder   = _renderer.sortingOrder + 1;
-    }
-
-    public void RemoveItem()
-    {
-        _currentItem = null;
-        if (_gridManager != null && !HasSpawner())
-        {
-            _gridManager.MarkTileFree(_gridPosition);
-        }
+        sr.sortingOrder = _renderer.sortingOrder + 1;
     }
 
     public Vector2Int GridPosition => _gridPosition;
-
-
 }

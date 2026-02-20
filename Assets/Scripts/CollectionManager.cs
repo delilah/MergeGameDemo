@@ -48,20 +48,12 @@ public class CollectionManager : MonoBehaviour
             return;
         }
 
-        // Get current count or default to 0
-        if (!_collectionCounts.TryGetValue(itemData, out int currentCount))
-        {
-            currentCount = 0;
-        }
+        _collectionCounts.TryGetValue(itemData, out int currentCount);
+        _collectionCounts[itemData] = currentCount + 1;
 
-        // Increment count
-        int newCount = currentCount + 1;
-        _collectionCounts[itemData] = newCount;
+        Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {currentCount + 1}");
 
-        Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {newCount}");
-
-        // Fire events for listeners
-        OnItemCollected?.Invoke(itemData, newCount);
+        OnItemCollected?.Invoke(itemData, currentCount + 1);
         OnCollectionChanged?.Invoke();
     }
 
@@ -100,7 +92,8 @@ public class CollectionManager : MonoBehaviour
     {
         if (itemData != null && _collectionCounts.ContainsKey(itemData))
         {
-            _collectionCounts[itemData] = 0;
+            // _collectionCounts[itemData] = 0;
+            _collectionCounts.Remove(itemData);
             OnCollectionChanged?.Invoke();
         }
     }

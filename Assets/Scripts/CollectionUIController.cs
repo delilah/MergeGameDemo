@@ -19,14 +19,22 @@ public class CollectionUIController : MonoBehaviour
     // Reusable StringBuilder to avoid allocations
     private StringBuilder _textBuilder = new StringBuilder();
 
+    private CollectionManager _collectionManager;
+
+
     private void OnEnable()
     {
         // Subscribe to collection events
-        if (CollectionManager.Instance != null)
+        _collectionManager = CollectionManager.Instance;
+
+        if (_collectionManager == null)
         {
-            CollectionManager.Instance.OnItemCollected += HandleItemCollected;
-            CollectionManager.Instance.OnCollectionChanged += HandleCollectionChanged;
+            Debug.LogWarning("CollectionManager not found during OnEnable — UI will not update.");
+            return;
         }
+
+        _collectionManager.OnItemCollected += HandleItemCollected;
+        _collectionManager.OnCollectionChanged += HandleCollectionChanged;
 
         // Initial UI update
         UpdateUI();
@@ -35,10 +43,10 @@ public class CollectionUIController : MonoBehaviour
     private void OnDisable()
     {
         // Unsubscribe from events
-        if (CollectionManager.Instance != null)
+        if (_collectionManager != null)
         {
-            CollectionManager.Instance.OnItemCollected -= HandleItemCollected;
-            CollectionManager.Instance.OnCollectionChanged -= HandleCollectionChanged;
+            _collectionManager.OnItemCollected -= HandleItemCollected;
+            _collectionManager.OnCollectionChanged -= HandleCollectionChanged;
         }
     }
 
@@ -82,8 +90,8 @@ public class CollectionUIController : MonoBehaviour
             {
                 if (itemData == null) continue;
 
-                int count = CollectionManager.Instance != null 
-                    ? CollectionManager.Instance.GetCount(itemData) 
+                int count = _collectionManager != null 
+                    ? _collectionManager.GetCount(itemData) 
                     : 0;
 
                 // Skip if showing only collected and count is 0
@@ -94,10 +102,10 @@ public class CollectionUIController : MonoBehaviour
         }
         else
         {
-            // Display all collected items from the manager
-            if (CollectionManager.Instance != null)
+            // Display all collected items from the _collectionManager
+            if (_collectionManager != null)
             {
-                var allCounts = CollectionManager.Instance.GetAllCounts();
+                var allCounts = _collectionManager.GetAllCounts();
                 
                 if (allCounts.Count == 0)
                 {
