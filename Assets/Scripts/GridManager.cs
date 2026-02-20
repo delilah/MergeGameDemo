@@ -44,6 +44,9 @@ public class GridManager : MonoBehaviour
 
         _tilesParent = new GameObject(TILES_PARENT_NAME);
         _itemsParent = new GameObject(ITEMS_PARENT_NAME);
+
+        Item.OnItemReturnRequested.AddListener(ReturnItemToPool);
+
     }
 
     public bool GenerateGrid()
@@ -198,12 +201,15 @@ public class GridManager : MonoBehaviour
         return Instantiate(_itemPrefab, _itemsParent.transform);
     }
 
+
     public void ReturnItemToPool(Item item)
     {
         if (item == null) return;
 
         item.gameObject.SetActive(false);
-        item.transform.SetParent(_itemsParent != null ? _itemsParent.transform : transform);
+        // item.transform.SetParent(_itemsParent != null ? _itemsParent.transform : transform);
+        item.transform.SetParent(_itemsParent.transform);
+        item.transform.localPosition = Vector3.zero;
         _itemPool.Push(item);
     }
 
@@ -218,5 +224,10 @@ public class GridManager : MonoBehaviour
         {
             _freeTilePositions.Add(gridPos);
         }
+    }
+
+    private void OnDestroy()
+    {
+        Item.OnItemReturnRequested.RemoveListener(ReturnItemToPool);
     }
 }
