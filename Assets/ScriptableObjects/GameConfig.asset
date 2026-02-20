@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20a6d378eb1c9c84686535633afa0305, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  collectSound: {fileID: 8300000, guid: e3721db4581bf5c4990208d9e47a61a9, type: 3}
+  backgroundMusic: {fileID: 8300000, guid: 7a6ec830109bd9846bc16a4c30b1b68a, type: 3}
+  musicVolume: 0.2
+  sfxVolume: 1
+  backgroundSprite: {fileID: 0}
+  backgroundColor: {r: 1, g: 1, b: 1, a: 1}

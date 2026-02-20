@@ -55,13 +55,9 @@ public class CollectionUIController : MonoBehaviour
     /// </summary>
     private void HandleItemCollected(MergeItemData itemData, int newCount)
     {
-        // Show feedback message
-        Debug.Log($"{itemData.itemName} collected! Total: {newCount}");
+        // React to THIS specific item — popup, sound, animation
         
-        // You can add popup/toast notification here
-        // ShowCollectionPopup($"{itemData.itemName} collected!");
-
-        // Update the full UI
+        ShowCollectionPopup($"{itemData.itemName} collected!");
         UpdateUI();
     }
 
@@ -70,6 +66,7 @@ public class CollectionUIController : MonoBehaviour
     /// </summary>
     private void HandleCollectionChanged()
     {
+        // Just refresh everything, no specific item context atm
         UpdateUI();
     }
 

@@ -92,7 +92,6 @@ public class CollectionManager : MonoBehaviour
     {
         if (itemData != null && _collectionCounts.ContainsKey(itemData))
         {
-            // _collectionCounts[itemData] = 0;
             _collectionCounts.Remove(itemData);
             OnCollectionChanged?.Invoke();
         }
