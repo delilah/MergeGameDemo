@@ -4,13 +4,11 @@ using UnityEngine.EventSystems;
 
 public class Spawner : MonoBehaviour, IPointerDownHandler
 {
-    public SpawnerData spawnerData;
+    [SerializeField] private SpawnerData _spawnerData;
 
     [Header("References")]
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private Collider2D _collider;
-    
-    private GridManager _gridManager;
 
     private Tile _tile;
     private float _nextAvailableTime = 0f;
@@ -20,10 +18,10 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
     public void Initialize(SpawnerData data)
     {
-        spawnerData = data;
-        if (_spriteRenderer != null && spawnerData != null && spawnerData.sprite != null)
+        _spawnerData = data;
+        if (_spriteRenderer != null && _spawnerData != null && _spawnerData.sprite != null)
         {
-            _spriteRenderer.sprite = spawnerData.sprite;
+            _spriteRenderer.sprite = _spawnerData.sprite;
         }
 
         PrecomputeSpawnableCandidates();
@@ -32,13 +30,13 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     private void PrecomputeSpawnableCandidates()
     {
         _spawnableCandidates.Clear();
-        if (spawnerData != null && spawnerData.spawnableItems != null)
+        if (_spawnerData != null && _spawnerData.spawnableItems != null)
         {
-            for (int i = 0; i < spawnerData.spawnableItems.Length; i++)
+            for (int i = 0; i < _spawnerData.spawnableItems.Length; i++)
             {
-                if (spawnerData.spawnableItems[i] != null)
+                if (_spawnerData.spawnableItems[i] != null)
                 {
-                    _spawnableCandidates.Add(spawnerData.spawnableItems[i]);
+                    _spawnableCandidates.Add(_spawnerData.spawnableItems[i]);
                 }
             }
         }
@@ -51,12 +49,9 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         if (_collider == null) _collider = GetComponentInChildren<Collider2D>();
         if (_collider == null)
         {
-            // Ensure a collider exists on this object for pointer events
             _collider = gameObject.AddComponent<BoxCollider2D>();
         }
-        
-        // Use singleton instead of FindObjectOfType
-        _gridManager = GridManager.Instance;
+
         _tile = GetComponentInParent<Tile>();
 
         EnsureColliderSized();
@@ -71,12 +66,21 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         }
     }
 
+    // NOTE: added OnDestroy to clear _active if this spawner is destroyed.
+    // OnDisable is not reliably called on destroyed objects during scene reloads,
+    // so without this _active could hold a stale reference to a destroyed spawner.
+    private void OnDestroy()
+    {
+        if (_active == this)
+        {
+            _active = null;
+        }
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log($"Spawner tapped: {name}");
         if (_active != this)
         {
-            // Select this spawner
             if (_active != null)
             {
                 _active.SetSelected(false);
@@ -100,7 +104,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
     private void TrySpawn()
     {
-        if (spawnerData == null)
+        if (_spawnerData == null)
         {
             Debug.LogWarning("SpawnerData is null; cannot spawn.");
             return;
@@ -108,11 +112,11 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
         if (Time.time < _nextAvailableTime)
         {
-            // On cooldown
             return;
         }
 
-        if (_gridManager == null)
+        GridManager gridManager = GridManager.Instance;
+        if (gridManager == null)
         {
             Debug.LogWarning("GridManager not ready; cannot spawn.");
             return;
@@ -124,29 +128,25 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             return;
         }
 
-        IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
+        IReadOnlyList<Vector2Int> freeTiles = gridManager.FreeTilePositions;
         if (freeTiles.Count == 0)
         {
             Debug.Log("No available tiles");
             return;
         }
 
-        // Pick random item and tile
         int itemIdx = Random.Range(0, _spawnableCandidates.Count);
         MergeItemData itemData = _spawnableCandidates[itemIdx];
 
         int tileIdx = Random.Range(0, freeTiles.Count);
         Vector2Int gridPos = freeTiles[tileIdx];
 
-        // Spawn via GridManager
-        Debug.Log($"Spawning {itemData.name} at {gridPos}");
-        _gridManager.SpawnItem(itemData, gridPos);
+        gridManager.SpawnItem(itemData, gridPos);
 
         // Start cooldown
-        _nextAvailableTime = Time.time + Mathf.Max(0f, spawnerData.spawnCooldown);
+        _nextAvailableTime = Time.time + Mathf.Max(0f, _spawnerData.spawnCooldown);
     }
 
-    // Assigned by Tile when this spawner is placed under it
     public void SetTile(Tile tile)
     {
         _tile = tile;
@@ -154,7 +154,6 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
 
     private void EnsureColliderSized()
     {
-        // If we control a BoxCollider2D, size it to match sprite for reliable pointer hits
         var box = _collider as BoxCollider2D;
         if (box != null && _spriteRenderer != null && _spriteRenderer.sprite != null)
         {
