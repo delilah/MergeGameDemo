@@ -10,6 +10,9 @@ using TMPro;
 public class CollectionUIController : MonoBehaviour
 {
     [Header("UI References")]
+    // Assigned to DynamicCanvas, separated from StaticCanvas to avoid
+    // triggering full Canvas rebuilds on static elements when collection updates.
+    // Updated via StringBuilder to avoid per-frame string allocations on mobile.
     [SerializeField] private TMP_Text _collectionText;
 
     [Header("Display Settings")]
@@ -22,27 +25,30 @@ public class CollectionUIController : MonoBehaviour
     private CollectionManager _collectionManager;
 
 
-    private void OnEnable()
+    private void Start()
     {
-        // Subscribe to collection events
         _collectionManager = CollectionManager.Instance;
 
         if (_collectionManager == null)
         {
-            Debug.LogWarning("CollectionManager not found during OnEnable — UI will not update.");
+            Debug.LogWarning("CollectionManager not found during Start! UI will not update.");
             return;
         }
 
         _collectionManager.OnItemCollected += HandleItemCollected;
         _collectionManager.OnCollectionChanged += HandleCollectionChanged;
 
-        // Initial UI update
         UpdateUI();
+    }
+
+    private void OnEnable()
+    {
+        // Intentionally empty. Subscription handled in Start to ensure
+        // CollectionManager singleton is initialized before we access it
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from events
         if (_collectionManager != null)
         {
             _collectionManager.OnItemCollected -= HandleItemCollected;
@@ -50,73 +56,66 @@ public class CollectionUIController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when a specific item is collected
-    /// </summary>
     private void HandleItemCollected(MergeItemData itemData, int newCount)
     {
-        // React to THIS specific item — popup, sound, animation
-        
         ShowCollectionPopup($"{itemData.itemName} collected!");
         UpdateUI();
     }
 
-    /// <summary>
-    /// Called when any collection data changes
-    /// </summary>
     private void HandleCollectionChanged()
     {
-        // Just refresh everything, no specific item context atm
         UpdateUI();
     }
 
     /// <summary>
-    /// Rebuild the collection text using StringBuilder
+    /// Rebuilds the collection text using StringBuilder.
+    /// Displays total count of all collected items, followed by per-item breakdown.
     /// </summary>
     private void UpdateUI()
     {
         if (_collectionText == null) return;
 
         _textBuilder.Clear();
-        _textBuilder.AppendLine("=== Collection ===");
 
         if (_trackedItems != null && _trackedItems.Length > 0)
         {
             // Display specific tracked items
+            int total = 0;
             foreach (var itemData in _trackedItems)
             {
                 if (itemData == null) continue;
+                int count = _collectionManager != null ? _collectionManager.GetCount(itemData) : 0;
+                total += count;
+            }
 
-                int count = _collectionManager != null 
-                    ? _collectionManager.GetCount(itemData) 
-                    : 0;
+            _textBuilder.Append($"Collected: {total}");
 
-                // Skip if showing only collected and count is 0
+            foreach (var itemData in _trackedItems)
+            {
+                if (itemData == null) continue;
+                int count = _collectionManager != null ? _collectionManager.GetCount(itemData) : 0;
                 if (_showOnlyCollected && count == 0) continue;
-
-                _textBuilder.AppendLine($"{itemData.itemName}: {count}");
+                _textBuilder.AppendLine();
+                _textBuilder.Append($"{itemData.itemName}: {count}");
             }
         }
         else
         {
-            // Display all collected items from the _collectionManager
+            // Display all collected items from CollectionManager
             if (_collectionManager != null)
             {
                 var allCounts = _collectionManager.GetAllCounts();
-                
-                if (allCounts.Count == 0)
-                {
-                    _textBuilder.AppendLine("No items collected yet");
-                }
-                else
-                {
-                    foreach (var kvp in allCounts)
-                    {
-                        if (kvp.Key == null) continue;
-                        if (_showOnlyCollected && kvp.Value == 0) continue;
+                int total = 0;
+                foreach (var kvp in allCounts) total += kvp.Value;
 
-                        _textBuilder.AppendLine($"{kvp.Key.itemName}: {kvp.Value}");
-                    }
+                _textBuilder.Append($"Collected: {total}");
+
+                foreach (var kvp in allCounts)
+                {
+                    if (kvp.Key == null) continue;
+                    if (_showOnlyCollected && kvp.Value == 0) continue;
+                    _textBuilder.AppendLine();
+                    _textBuilder.Append($"{kvp.Key.itemName}: {kvp.Value}");
                 }
             }
         }
@@ -124,13 +123,9 @@ public class CollectionUIController : MonoBehaviour
         _collectionText.text = _textBuilder.ToString();
     }
 
-    /// <summary>
-    /// Optional: Show a temporary popup when item is collected
-    /// </summary>
     private void ShowCollectionPopup(string message)
     {
         // TODO: Implement floating text, toast, or popup
-        // For now, just log
         Debug.Log($"[Popup] {message}");
     }
 }
