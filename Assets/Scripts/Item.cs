@@ -98,7 +98,7 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         {
             if (CollectionManager.Instance != null)
             {
-                CollectionManager.Instance.Collect(_data);
+                CollectionManager.Instance.Collect(_data, transform.position);
             }
 
             Debug.Log($"{_data.itemName} collected!");

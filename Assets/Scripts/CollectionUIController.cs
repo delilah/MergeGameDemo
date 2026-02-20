@@ -15,6 +15,9 @@ public class CollectionUIController : MonoBehaviour
     // Updated via StringBuilder to avoid per-frame string allocations on mobile.
     [SerializeField] private TMP_Text _collectionText;
 
+    [Header("Effects")]
+    [SerializeField] private ParticleSystem _collectParticlesPrefab;
+
     [Header("Display Settings")]
     [SerializeField] private MergeItemData[] _trackedItems; // Items to display in UI
     [SerializeField] private bool _showOnlyCollected = false; // Only show items with count > 0
@@ -56,15 +59,24 @@ public class CollectionUIController : MonoBehaviour
         }
     }
 
-    private void HandleItemCollected(MergeItemData itemData, int newCount)
+    private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)
     {
         ShowCollectionPopup($"{itemData.itemName} collected!");
+        SpawnCollectParticles(position);
+
         UpdateUI();
     }
 
     private void HandleCollectionChanged()
     {
         UpdateUI();
+    }
+
+
+    private void SpawnCollectParticles(Vector3 position)
+    {
+        if (_collectParticlesPrefab == null) return;
+        Instantiate(_collectParticlesPrefab, position, Quaternion.identity);
     }
 
     /// <summary>

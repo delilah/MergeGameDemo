@@ -17,7 +17,7 @@ public class CollectionManager : MonoBehaviour
     /// Event fired when an item is collected.
     /// Parameters: (MergeItemData itemData, int newTotalCount)
     /// </summary>
-    public event Action<MergeItemData, int> OnItemCollected;
+    public event Action<MergeItemData, int, Vector3> OnItemCollected;
 
     /// <summary>
     /// Event fired when any collection count changes (useful for UI refresh)
@@ -40,7 +40,7 @@ public class CollectionManager : MonoBehaviour
     /// <summary>
     /// Register that an item has been collected
     /// </summary>
-    public void Collect(MergeItemData itemData)
+    public void Collect(MergeItemData itemData, Vector3 worldPosition)
     {
         if (itemData == null)
         {
@@ -53,7 +53,7 @@ public class CollectionManager : MonoBehaviour
 
         Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {currentCount + 1}");
 
-        OnItemCollected?.Invoke(itemData, currentCount + 1);
+        OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
         OnCollectionChanged?.Invoke();
     }
 

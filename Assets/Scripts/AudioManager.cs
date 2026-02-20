@@ -38,7 +38,7 @@ private void Start()
             CollectionManager.Instance.OnItemCollected -= HandleItemCollected;
     }
 
-    private void HandleItemCollected(MergeItemData itemData, int newCount)
+    private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)
     {
             Debug.Log($"AudioManager: HandleItemCollected called for {itemData?.itemName}");
 

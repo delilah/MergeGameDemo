@@ -940,6 +940,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collectionText: {fileID: 290256994}
+  _collectParticlesPrefab: {fileID: 4808600676139899719, guid: a0278d8d000f7ef4d9c1f72543afca6e, type: 3}
   _trackedItems: []
   _showOnlyCollected: 0
 --- !u!1 &1682716738
