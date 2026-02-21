@@ -14,6 +14,7 @@ public class CollectionUIController : MonoBehaviour
     // triggering full Canvas rebuilds on static elements when collection updates.
     // Updated via StringBuilder to avoid per-frame string allocations on mobile.
     [SerializeField] private TMP_Text _collectionText;
+    // [SerializeField] private TMP_Text _itemCollectedPopupText; // TODO: implement floating text
 
     [Header("Effects")]
     [SerializeField] private ParticleSystem _collectParticlesPrefab;

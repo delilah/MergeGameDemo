@@ -9,6 +9,7 @@ using UnityEngine;
 public class CollectionManager : MonoBehaviour
 {
     public static CollectionManager Instance { get; private set; }
+    public int TotalCollected { get; private set; }
 
     // Dictionary to track count per item type
     private Dictionary<MergeItemData, int> _collectionCounts = new Dictionary<MergeItemData, int>();
@@ -23,6 +24,7 @@ public class CollectionManager : MonoBehaviour
     /// Event fired when any collection count changes (useful for UI refresh)
     /// </summary>
     public event Action OnCollectionChanged;
+    public event Action OnGameOver;
 
     private void Awake()
     {
@@ -51,11 +53,20 @@ public class CollectionManager : MonoBehaviour
         _collectionCounts.TryGetValue(itemData, out int currentCount);
         _collectionCounts[itemData] = currentCount + 1;
 
+        TotalCollected++;
+
         Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {currentCount + 1}");
 
         OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
         OnCollectionChanged?.Invoke();
-    }
+
+        if (TotalCollected >= 7)
+        {
+            OnGameOver?.Invoke();
+        }
+    }         
+
+   
 
     /// <summary>
     /// Get the collection count for a specific item type

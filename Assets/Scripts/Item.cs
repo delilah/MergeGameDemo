@@ -21,6 +21,8 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     private Vector3 _pointerOffset;
     private Camera _mainCamera;
 
+    private const int DRAG_SORTING_ORDER_OFFSET = 20;
+
     
 
     public void Initialize(MergeItemData data, Tile tile)
@@ -116,7 +118,7 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         if (_spriteRenderer != null)
         {
             _originalSortingOrder = _spriteRenderer.sortingOrder;
-            _spriteRenderer.sortingOrder = _originalSortingOrder + 20;
+            _spriteRenderer.sortingOrder = _originalSortingOrder + DRAG_SORTING_ORDER_OFFSET;
         }
     }
 

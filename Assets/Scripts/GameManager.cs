@@ -21,13 +21,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if (!_gridManager.GenerateGrid())
-        {
-            Debug.LogError("Failed to generate grid. Aborting game start.");
-            return;
-        }
-        PlaceTestSpawner();
-        // PlaceTestItems();
+        CollectionManager.Instance.OnGameOver += GameOver;
+
+        LoadGame();
     }
 
 
@@ -58,6 +54,28 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Spawner placed on Tile 3,3 at position {spawner.transform.position}");
     }
 
+    public void ResetGame()
+    {
+        
+    }
+
+    public void LoadGame()
+    {
+        if (!_gridManager.GenerateGrid())
+        {
+            Debug.LogError("Failed to generate grid. Aborting game start.");
+            return;
+        }
+        PlaceTestSpawner();
+    }
+
+    public void GameOver()
+    {
+        // todo: if score is high enough, go to game over screen
+        // For now, just print to console
+        Debug.Log("Game Over!");
+    }
+
 
     private void PlaceTestItems()
     {
@@ -74,5 +92,11 @@ public class GameManager : MonoBehaviour
             MergeItemData data = _testItems[i];
             _gridManager.SpawnItem(data, positions[i]);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (CollectionManager.Instance != null)
+            CollectionManager.Instance.OnGameOver -= GameOver;
     }
 }
