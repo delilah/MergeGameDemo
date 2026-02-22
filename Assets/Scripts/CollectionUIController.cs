@@ -29,26 +29,15 @@ public class CollectionUIController : MonoBehaviour
     private CollectionManager _collectionManager;
 
 
-    private void Start()
+    private void OnEnable()
     {
         _collectionManager = CollectionManager.Instance;
-
-        if (_collectionManager == null)
-        {
-            Debug.LogWarning("CollectionManager not found during Start! UI will not update.");
-            return;
-        }
+        if (_collectionManager == null) return;
 
         _collectionManager.OnItemCollected += HandleItemCollected;
         _collectionManager.OnCollectionChanged += HandleCollectionChanged;
 
-        UpdateUI();
-    }
-
-    private void OnEnable()
-    {
-        // Intentionally empty. Subscription handled in Start to ensure
-        // CollectionManager singleton is initialized before we access it
+        UpdateUI(); 
     }
 
     private void OnDisable()
@@ -101,7 +90,7 @@ public class CollectionUIController : MonoBehaviour
                 total += count;
             }
 
-            _textBuilder.Append($"Collected: {total}");
+            _textBuilder.Append($" {total}");
 
             foreach (var itemData in _trackedItems)
             {

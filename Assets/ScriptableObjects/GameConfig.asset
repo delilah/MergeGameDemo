@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20a6d378eb1c9c84686535633afa0305, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
+  itemsToWin: 7
   collectSound: {fileID: 8300000, guid: e3721db4581bf5c4990208d9e47a61a9, type: 3}
   backgroundMusic: {fileID: 8300000, guid: 7a6ec830109bd9846bc16a4c30b1b68a, type: 3}
   musicVolume: 0.2

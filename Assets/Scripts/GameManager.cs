@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Spawner _spawnerPrefab; // generic prefab
     [SerializeField] private SpawnerData _testSpawnerData;
     [SerializeField] private MergeItemData[] _testItems; // ScriptableObjects for items
+
+    public event Action OnGameStarted;
+    public event Action OnPlayAgain;
 
     private void Awake()
     {
@@ -22,8 +27,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         CollectionManager.Instance.OnGameOver += GameOver;
-
-        LoadGame();
     }
 
 
@@ -54,12 +57,15 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Spawner placed on Tile 3,3 at position {spawner.transform.position}");
     }
 
-    public void ResetGame()
+
+    public void StartGame()
     {
-        
+        LoadGame();
+        _gridManager.SetGameObjectsActive(true);
+        OnGameStarted?.Invoke();
     }
 
-    public void LoadGame()
+        public void LoadGame()
     {
         if (!_gridManager.GenerateGrid())
         {
@@ -69,29 +75,17 @@ public class GameManager : MonoBehaviour
         PlaceTestSpawner();
     }
 
-    public void GameOver()
+    public void PlayAgain()
     {
-        // todo: if score is high enough, go to game over screen
-        // For now, just print to console
-        Debug.Log("Game Over!");
+        CollectionManager.Instance.ResetAllCounts();
+        _gridManager.ClearGrid();
+        OnPlayAgain?.Invoke();
     }
 
-
-    private void PlaceTestItems()
+    public void GameOver()
     {
-        // Place items on specific tiles for testing purposes, TODO: remove this
-        Vector2Int[] positions = new Vector2Int[]
-        {
-            new Vector2Int(0, 0),
-            new Vector2Int(1, 1),
-            new Vector2Int(2, 2)
-        };
-
-        for (int i = 0; i < positions.Length && i < _testItems.Length; i++)
-        {
-            MergeItemData data = _testItems[i];
-            _gridManager.SpawnItem(data, positions[i]);
-        }
+        _gridManager.SetGameObjectsActive(false);
+        Debug.Log("Game Over!");
     }
 
     private void OnDestroy()

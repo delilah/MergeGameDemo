@@ -8,6 +8,8 @@ using UnityEngine;
 /// </summary>
 public class CollectionManager : MonoBehaviour
 {
+    [SerializeField] private GameConfig _gameConfig;
+
     public static CollectionManager Instance { get; private set; }
     public int TotalCollected { get; private set; }
 
@@ -60,7 +62,13 @@ public class CollectionManager : MonoBehaviour
         OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
         OnCollectionChanged?.Invoke();
 
-        if (TotalCollected >= 7)
+        if (_gameConfig == null)
+        {
+            Debug.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");
+            return;
+        }
+
+        if (TotalCollected >= _gameConfig.itemsToWin)
         {
             OnGameOver?.Invoke();
         }
@@ -92,6 +100,7 @@ public class CollectionManager : MonoBehaviour
     public void ResetAllCounts()
     {
         _collectionCounts.Clear();
+        TotalCollected = 0;
         OnCollectionChanged?.Invoke();
         Debug.Log("CollectionManager: All counts reset");
     }

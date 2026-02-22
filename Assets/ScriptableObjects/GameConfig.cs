@@ -3,6 +3,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "GameConfig", menuName = "Game/GameConfig")]
 public class GameConfig : ScriptableObject
 {
+
+    [Header("Gameplay")]
+    public int itemsToWin = 7;
+
     [Header("Audio")]
     public AudioClip collectSound;
     public AudioClip backgroundMusic;

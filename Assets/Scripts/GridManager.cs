@@ -226,6 +226,30 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    public void SetGameObjectsActive(bool active)
+    {
+        _tilesParent.SetActive(active);
+        _itemsParent.SetActive(active);
+    }
+
+    public void ClearGrid()
+    {
+        if (_tiles == null) return;
+        
+        foreach (Tile tile in _tiles.Values)
+        {
+            if (tile == null) continue;
+            if (tile.HasItem())
+            {
+                Destroy(tile.GetItem().gameObject);
+                tile.ClearItem();
+            }
+        }
+        _itemPool.Clear();
+    }
+
+
+
     private void OnDestroy()
     {
         Item.OnItemReturnRequested.RemoveListener(ReturnItemToPool);
