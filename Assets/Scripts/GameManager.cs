@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        Application.targetFrameRate = 60;
     }
 
     void Start()
