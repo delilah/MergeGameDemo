@@ -196,7 +196,7 @@ public class GridManager : MonoBehaviour
             return item;
         }
 
-        Debug.Assert(_itemsParent != null, "ItemsParent is null — was Awake called?");
+        Debug.Assert(_itemsParent != null, "ItemsParent is null: was Awake called?");
 
         return Instantiate(_itemPrefab, _itemsParent.transform);
     }
@@ -207,7 +207,6 @@ public class GridManager : MonoBehaviour
         if (item == null) return;
 
         item.gameObject.SetActive(false);
-        // item.transform.SetParent(_itemsParent != null ? _itemsParent.transform : transform);
         item.transform.SetParent(_itemsParent.transform);
         item.transform.localPosition = Vector3.zero;
         _itemPool.Push(item);

@@ -65,7 +65,7 @@ public class Tile : MonoBehaviour
 
     public void PlaceItem(Item item)
     {
-        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name} — was SetGridPosition called?");
+        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name}: was SetGridPosition called?");
 
         _currentItem = item;
         if (item == null) return;
@@ -81,7 +81,7 @@ public class Tile : MonoBehaviour
 
     public void RemoveItem()
     {
-        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name} — was SetGridPosition called?");
+        Debug.Assert(_gridManager != null, $"GridManager is null on tile {name}: was SetGridPosition called?");
 
         _currentItem = null;
 
