@@ -169,6 +169,12 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
             return true;
         }
 
+        // If dropping on own tile (e.g., from clamping at grid edges), reject the drop
+        if (targetItem == this)
+        {
+            return false;
+        }
+
         if (targetItem.Data == this.Data)
         {
             MergeWith(targetItem);

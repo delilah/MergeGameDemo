@@ -157,6 +157,10 @@ public class GridManager : MonoBehaviour
         int x = Mathf.RoundToInt((worldPos.x - _startPos.x) / _tileSize);
         int y = Mathf.RoundToInt((worldPos.y - _startPos.y) / _tileSize);
 
+        // clamp to grid bounds instead of returning null on edges
+        x = Mathf.Clamp(x, 0, _width - 1);
+        y = Mathf.Clamp(y, 0, _height - 1);
+
         return GetTileAtPosition(new Vector2Int(x, y));
     }
 
@@ -238,10 +242,16 @@ public class GridManager : MonoBehaviour
         foreach (Tile tile in _tiles.Values)
         {
             if (tile == null) continue;
+            
             if (tile.HasItem())
             {
                 Destroy(tile.GetItem().gameObject);
                 tile.ClearItem();
+            }
+            
+            if (tile.HasSpawner())
+            {
+                Destroy(tile.GetSpawner().gameObject);
             }
         }
         _itemPool.Clear();

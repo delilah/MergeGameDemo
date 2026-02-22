@@ -6,7 +6,7 @@ A Unity-based merge puzzle game with cats.
 
 This is a merge-two puzzle game where players combine identical items to create higher-tier items. The goal is to collect final-tier items by merging through a progression chain. The game features a grid-based system, drag-and-drop mechanics, item spawning, and collection tracking.
 
-It is a very small project by design, for educational and portfolio purposes.
+It is a very small project by design, for learning and practice purposes.
 
 ## Setup Instructions
 
