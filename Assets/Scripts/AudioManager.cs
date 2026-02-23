@@ -8,29 +8,35 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource _sfxSource;
     [SerializeField] private AudioSource _musicSource;
 
-private void Awake()
-{
-    if (Instance != null && Instance != this)
-    {
-        Destroy(gameObject);
-        return;
-    }
-    Instance = this;
-}
+    public AudioClip SpawnerClickSound => _config?.sfx.spawnerClick;
+    public AudioClip MergeSound => _config?.sfx.merge;
+    public AudioClip MergeSoundItems => _config?.sfx.mergeItems;
+    public AudioClip MergeSoundKittens => _config?.sfx.mergeKittens;
+    public AudioClip CollectSound => _config?.sfx.collect;
 
-private void Start()
-{
-    if (CollectionManager.Instance != null)
+    private void Awake()
     {
-        CollectionManager.Instance.OnItemCollected += HandleItemCollected;
-    }
-    else
-    {
-        Debug.LogError("AudioManager: CollectionManager.Instance is null in Start!");
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
     }
 
-    PlayMusic();
-}
+    private void Start()
+    {
+        if (CollectionManager.Instance != null)
+        {
+            CollectionManager.Instance.OnItemCollected += HandleItemCollected;
+        }
+        else
+        {
+            Debug.LogError("AudioManager: CollectionManager.Instance is null in Start!");
+        }
+
+        PlayMusic();
+    }
 
     private void OnDestroy()
     {
@@ -38,19 +44,26 @@ private void Start()
             CollectionManager.Instance.OnItemCollected -= HandleItemCollected;
     }
 
+    //Play Collect Sound
     private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)
     {
-            Debug.Log($"AudioManager: HandleItemCollected called for {itemData?.itemName}");
-
-        PlayCollectSound();
+        PlaySfx(_config?.sfx.collect);
     }
 
-    public void PlayCollectSound()
+    public void PlaySfx(AudioClip clip)
     {
-            Debug.Log($"PlayCollectSound called. Config={_config != null}, Clip={_config?.collectSound != null}, SfxSource={_sfxSource != null}");
+        if (clip == null || _sfxSource == null) return;
+        _sfxSource.PlayOneShot(clip, _config.sfxVolume);
+    }
 
-        if (_config == null || _config.collectSound == null) return;
-        _sfxSource.PlayOneShot(_config.collectSound, _config.sfxVolume);
+    public void PlayMergeSound(int level)
+    {
+        if (level == 0)
+            PlaySfx(_config.sfx.mergeItems);
+        else if (level == 1)
+            PlaySfx(_config.sfx.mergeKittens);
+        else 
+            PlaySfx(_config.sfx.merge);
     }
 
     private void PlayMusic()

@@ -57,10 +57,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
         if (_collider == null) _collider = GetComponent<Collider2D>();
         if (_collider == null) _collider = GetComponentInChildren<Collider2D>();
-        if (_collider == null)
-        {
-            _collider = gameObject.AddComponent<BoxCollider2D>();
-        }
+        if (_collider == null) _collider = gameObject.AddComponent<BoxCollider2D>();
 
         _tile = GetComponentInParent<Tile>();
 
@@ -113,6 +110,8 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     {
         StopIntroSpawnerAnimation();
         OnSpawnerTouchAnimation();
+
+        AudioManager.Instance?.PlaySfx(AudioManager.Instance.SpawnerClickSound);
 
         if (_active != this)
         {

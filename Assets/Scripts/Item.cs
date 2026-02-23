@@ -22,7 +22,6 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     private Camera _mainCamera;
 
     private const int DRAG_SORTING_ORDER_OFFSET = 20;
-
     
 
     public void Initialize(MergeItemData data, Tile tile)
@@ -192,6 +191,13 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     private void MergeWith(Item targetItem)
     {
         Tile targetTile = targetItem.CurrentTile;
+
+        // Get current level before merging
+        int currentLevel = targetItem.Data.level;
+        
+        // Play merge sound based on level
+        AudioManager.Instance?.PlayMergeSound(currentLevel);
+
 
         ReturnToPool();
 
