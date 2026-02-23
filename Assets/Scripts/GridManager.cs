@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class GridManager : MonoBehaviour
 {
@@ -20,11 +21,12 @@ public class GridManager : MonoBehaviour
 
     private Dictionary<Vector2Int, Tile> _tiles;
     private GameObject _tilesParent;
-    private Stack<Tile> _tilePool = new Stack<Tile>(); // pooling
+
+    private ObjectPool<Tile> _tilePool; // pooling
+    private ObjectPool<Item> _itemPool; // pooling
     private const string TILES_PARENT_NAME = "Tiles";
     private const string ITEMS_PARENT_NAME = "Items";
     private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
-    private Stack<Item> _itemPool = new Stack<Item>(); //pooling
     private GameObject _itemsParent;
 
     private float _tileSize;
@@ -46,6 +48,20 @@ public class GridManager : MonoBehaviour
         _itemsParent = new GameObject(ITEMS_PARENT_NAME);
 
         Item.OnItemReturnRequested.AddListener(ReturnItemToPool);
+
+        _tilePool = new ObjectPool<Tile>(
+            createFunc: () => Instantiate(_tilePrefab, _tilesParent.transform),
+            actionOnGet: tile => tile.gameObject.SetActive(true),
+            actionOnRelease: tile => tile.gameObject.SetActive(false),
+            actionOnDestroy: tile => Destroy(tile.gameObject)
+        );
+
+        _itemPool = new ObjectPool<Item>(
+            createFunc: () => Instantiate(_itemPrefab, _itemsParent.transform),
+            actionOnGet: item => item.gameObject.SetActive(true),
+            actionOnRelease: item => item.gameObject.SetActive(false),
+            actionOnDestroy: item => Destroy(item.gameObject)
+        );
 
     }
 
@@ -78,7 +94,7 @@ public class GridManager : MonoBehaviour
             if (tile != null)
             {
                 tile.gameObject.SetActive(false);
-                _tilePool.Push(tile);
+                _tilePool.Release(tile);
             }
         }
 
@@ -130,19 +146,7 @@ public class GridManager : MonoBehaviour
         return true;
     }
 
-    private Tile GetOrCreateTile()
-    {
-        while (_tilePool.Count > 0)
-        {
-            Tile tile = _tilePool.Pop();
-            if (tile != null)
-            {
-                tile.gameObject.SetActive(true);
-                return tile;
-            }
-        }
-        return Instantiate(_tilePrefab, _tilesParent.transform);
-    }
+    private Tile GetOrCreateTile() => _tilePool.Get();
 
     public Tile GetTileAtPosition(Vector2Int pos)
     {
@@ -191,29 +195,13 @@ public class GridManager : MonoBehaviour
         return newItem;
     }
 
-    private Item GetItemFromPool()
-    {
-        if (_itemPool.Count > 0)
-        {
-            Item item = _itemPool.Pop();
-            item.gameObject.SetActive(true);
-            return item;
-        }
-
-        Debug.Assert(_itemsParent != null, "ItemsParent is null: was Awake called?");
-
-        return Instantiate(_itemPrefab, _itemsParent.transform);
-    }
-
+    private Item GetItemFromPool() => _itemPool.Get();
 
     public void ReturnItemToPool(Item item)
     {
         if (item == null) return;
-
-        item.gameObject.SetActive(false);
         item.transform.SetParent(_itemsParent.transform);
-        item.transform.localPosition = Vector3.zero;
-        _itemPool.Push(item);
+        _itemPool.Release(item); // handles SetActive(false) automatically
     }
 
     public void MarkTileOccupied(Vector2Int gridPos)

@@ -205,8 +205,6 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         }
     }
 
-    
-
     private void ReturnToPool()
     {
         _currentTile?.RemoveItem();
