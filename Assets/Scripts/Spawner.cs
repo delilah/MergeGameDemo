@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class Spawner : MonoBehaviour, IPointerDownHandler
 {
@@ -13,10 +14,17 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     private Tile _tile;
     private float _nextAvailableTime = 0f;
     private List<MergeItemData> _spawnableCandidates = new List<MergeItemData>();
+    private bool _playIntroAnimation;
+    private Tween _introTween;
+    private Tween _touchTween;
+    private Vector3 _baseScale;
+
+
+
 
     private static Spawner _active;
 
-    public void Initialize(SpawnerData data)
+    public void Initialize(SpawnerData data, bool playIntroAnimation = false)
     {
         _spawnerData = data;
         if (_spriteRenderer != null && _spawnerData != null && _spawnerData.sprite != null)
@@ -25,6 +33,8 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         }
 
         PrecomputeSpawnableCandidates();
+
+        _playIntroAnimation = playIntroAnimation;
     }
 
     private void PrecomputeSpawnableCandidates()
@@ -57,28 +67,53 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         EnsureColliderSized();
     }
 
-    private void OnDisable()
+    public void OnPlaced()
     {
-        if (_active == this)
+        _baseScale = transform.localScale;
+
+        if (_playIntroAnimation)
+            IntroSpawnerAnimation();
+    }
+
+
+    public void IntroSpawnerAnimation()
+    {
+        Vector3 baseScale = transform.localScale;
+        _introTween = transform.DOScale(baseScale + Vector3.one * 0.05f, 0.5f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine);
+    }
+
+    public void StopIntroSpawnerAnimation()
+    {
+        if (_introTween != null && _introTween.IsActive())
         {
-            SetSelected(false);
-            _active = null;
+            _introTween.Kill();
+            _introTween = null;
         }
     }
 
-    // NOTE: added OnDestroy to clear _active if this spawner is destroyed.
-    // OnDisable is not reliably called on destroyed objects during scene reloads,
-    // so without this _active could hold a stale reference to a destroyed spawner.
-    private void OnDestroy()
+
+    public void OnSpawnerTouchAnimation()
     {
-        if (_active == this)
-        {
-            _active = null;
-        }
+        if (_touchTween != null && _touchTween.IsActive())
+            _touchTween.Kill();
+
+        transform.localScale = _baseScale; // reset scale before animating so it doesn't grow indefinitely if player furiously clicks
+
+        _touchTween = transform.DOScale(_baseScale + Vector3.one * 0.05f, 0.1f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() =>
+                    transform.DOScale(_baseScale, 0.1f)
+                        .SetEase(Ease.InQuad));
     }
+
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        StopIntroSpawnerAnimation();
+        OnSpawnerTouchAnimation();
+
         if (_active != this)
         {
             if (_active != null)
@@ -166,5 +201,25 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             box.offset = Vector2.zero;
             box.enabled = true;
         }
+    }
+
+    private void OnDisable()
+    {
+        transform.DOKill();
+        if (_active == this)
+        {
+            SetSelected(false);
+            _active = null;
+        }
+    }
+
+    // NOTE: added OnDestroy to clear _active if this spawner is destroyed.
+    // OnDisable is not reliably called on destroyed objects during scene reloads,
+    // so without this _active could hold a stale reference to a destroyed spawner.
+    private void OnDestroy()
+    {
+        transform.DOKill();
+        if (_active == this)
+            _active = null;
     }
 }

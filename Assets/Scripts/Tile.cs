@@ -61,6 +61,8 @@ public class Tile : MonoBehaviour
         {
             _gridManager.MarkTileOccupied(_gridPosition);
         }
+
+        spawner.OnPlaced();
     }
 
     public void PlaceItem(Item item)

@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         }
 
         Spawner spawner = Instantiate(_spawnerPrefab);
-        spawner.Initialize(_testSpawnerData);
+        spawner.Initialize(_testSpawnerData, true);
 
         tile.PlaceSpawner(spawner);
 
