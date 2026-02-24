@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using Zenject;
+
 
 public class Spawner : MonoBehaviour, IPointerDownHandler
 {
@@ -18,6 +20,17 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
     private Tween _introTween;
     private Tween _touchTween;
     private Vector3 _baseScale;
+
+    private AudioManager _audioManager;
+    private GridManager _gridManager;
+    
+
+    [Inject] 
+    public void Construct(AudioManager audioManager, GridManager gridManager)
+    {
+        _audioManager = audioManager;
+        _gridManager = gridManager;
+    }
 
 
 
@@ -111,7 +124,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         StopIntroSpawnerAnimation();
         OnSpawnerTouchAnimation();
 
-        AudioManager.Instance?.PlaySfx(AudioManager.Instance.SpawnerClickSound);
+        _audioManager?.PlaySfx(_audioManager.SpawnerClickSound);
 
         if (_active != this)
         {
@@ -149,8 +162,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             return;
         }
 
-        GridManager gridManager = GridManager.Instance;
-        if (gridManager == null)
+        if (_gridManager == null)
         {
             Debug.LogWarning("GridManager not ready; cannot spawn.");
             return;
@@ -162,7 +174,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
             return;
         }
 
-        IReadOnlyList<Vector2Int> freeTiles = gridManager.FreeTilePositions;
+        IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
         if (freeTiles.Count == 0)
         {
             Debug.Log("No available tiles");
@@ -175,7 +187,7 @@ public class Spawner : MonoBehaviour, IPointerDownHandler
         int tileIdx = Random.Range(0, freeTiles.Count);
         Vector2Int gridPos = freeTiles[tileIdx];
 
-        gridManager.SpawnItem(itemData, gridPos);
+        _gridManager.SpawnItem(itemData, gridPos);
 
         // Start cooldown
         _nextAvailableTime = Time.time + Mathf.Max(0f, _spawnerData.spawnCooldown);

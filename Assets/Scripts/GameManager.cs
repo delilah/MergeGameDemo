@@ -1,12 +1,10 @@
 using UnityEngine;
 using System;
+using Zenject;
 
 
 public class GameManager : MonoBehaviour
-{
-    public static GameManager Instance { get; private set; }
-    
-    [SerializeField] private GridManager _gridManager;
+{    
     [SerializeField] private Spawner _spawnerPrefab; // generic prefab
     [SerializeField] private SpawnerData _testSpawnerData;
     [SerializeField] private MergeItemData[] _testItems; // ScriptableObjects for items
@@ -14,21 +12,26 @@ public class GameManager : MonoBehaviour
     public event Action OnGameStarted;
     public event Action OnPlayAgain;
 
+    private CollectionManager _collectionManager;
+    private GridManager _gridManager;
+    private DiContainer _container;
+
+    [Inject]
+    public void Construct(CollectionManager collectionManager, GridManager gridManager, DiContainer container)
+    {
+        _collectionManager = collectionManager;
+        _gridManager = gridManager;
+        _container = container;
+    }
+
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
         Application.targetFrameRate = 60;
     }
 
     void Start()
     {
-        CollectionManager.Instance.OnGameOver += GameOver;
+        _collectionManager.OnGameOver += GameOver;
     }
 
     private void Update()
@@ -60,14 +63,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        Spawner spawner = Instantiate(_spawnerPrefab);
+        Spawner spawner = _container.InstantiatePrefabForComponent<Spawner>(_spawnerPrefab);
         spawner.Initialize(_testSpawnerData, true);
 
         tile.PlaceSpawner(spawner);
 
         Debug.Log($"Spawner placed on Tile 3,3 at position {spawner.transform.position}");
     }
-
 
     public void StartGame()
     {
@@ -88,7 +90,7 @@ public class GameManager : MonoBehaviour
 
     public void PlayAgain()
     {
-        CollectionManager.Instance.ResetAllCounts();
+        _collectionManager.ResetAllCounts();
         _gridManager.ClearGrid();
         OnPlayAgain?.Invoke();
     }
@@ -101,7 +103,7 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (CollectionManager.Instance != null)
-            CollectionManager.Instance.OnGameOver -= GameOver;
+        if (_collectionManager != null)
+            _collectionManager.OnGameOver -= GameOver;
     }
 }

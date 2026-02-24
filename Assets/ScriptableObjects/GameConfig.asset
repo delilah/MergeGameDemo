@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: GameConfig
   m_EditorClassIdentifier: 
   itemsToWin: 7
-  collectSound: {fileID: 8300000, guid: e3721db4581bf5c4990208d9e47a61a9, type: 3}
+  sfx:
+    spawnerClick: {fileID: 8300000, guid: 07c533805ec071142b8f8c5891c5763d, type: 3}
+    merge: {fileID: 8300000, guid: a4a8f4c09d88b8b429e52187ee90af37, type: 3}
+    mergeItems: {fileID: 8300000, guid: 94df8a0be7275114a9db1012008bf70e, type: 3}
+    mergeKittens: {fileID: 8300000, guid: b79134af2cbacff48ac50debc0d560fe, type: 3}
+    collect: {fileID: 8300000, guid: e3721db4581bf5c4990208d9e47a61a9, type: 3}
   backgroundMusic: {fileID: 8300000, guid: 7a6ec830109bd9846bc16a4c30b1b68a, type: 3}
   musicVolume: 0.2
   sfxVolume: 1

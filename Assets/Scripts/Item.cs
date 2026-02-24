@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Zenject;
 
 
 public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
@@ -21,7 +22,20 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     private Vector3 _pointerOffset;
     private Camera _mainCamera;
 
+    private AudioManager _audioManager;
+    private CollectionManager _collectionManager;
+    private GridManager _gridManager;
+
     private const int DRAG_SORTING_ORDER_OFFSET = 20;
+    
+
+    [Inject]
+    public void Construct(AudioManager audioManager, CollectionManager collectionManager, GridManager gridManager)
+    {
+        _audioManager = audioManager;
+        _collectionManager = collectionManager;
+        _gridManager = gridManager;
+    }
     
 
     public void Initialize(MergeItemData data, Tile tile)
@@ -97,9 +111,9 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
 
         if (isFinal)
         {
-            if (CollectionManager.Instance != null)
+            if (_collectionManager != null)
             {
-                CollectionManager.Instance.Collect(_data, transform.position);
+                _collectionManager.Collect(_data, transform.position);
             }
 
             Debug.Log($"{_data.itemName} collected!");
@@ -139,8 +153,8 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Tile targetTile = GridManager.Instance != null
-            ? GridManager.Instance.GetTileAtWorldPosition(transform.position)
+        Tile targetTile = _gridManager != null
+            ? _gridManager.GetTileAtWorldPosition(transform.position)
             : null;
 
         bool dropped = OnDrop(targetTile);
@@ -196,7 +210,7 @@ public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
         int currentLevel = targetItem.Data.level;
         
         // Play merge sound based on level
-        AudioManager.Instance?.PlayMergeSound(currentLevel);
+        _audioManager.PlayMergeSound(currentLevel);
 
 
         ReturnToPool();

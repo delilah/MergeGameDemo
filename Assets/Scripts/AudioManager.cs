@@ -1,12 +1,12 @@
 using UnityEngine;
+using Zenject;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance { get; private set; }
-
-    [SerializeField] private GameConfig _config;
     [SerializeField] private AudioSource _sfxSource;
     [SerializeField] private AudioSource _musicSource;
+
+    private CollectionManager _collectionManager;
 
     public AudioClip SpawnerClickSound => _config?.sfx.spawnerClick;
     public AudioClip MergeSound => _config?.sfx.merge;
@@ -14,25 +14,20 @@ public class AudioManager : MonoBehaviour
     public AudioClip MergeSoundKittens => _config?.sfx.mergeKittens;
     public AudioClip CollectSound => _config?.sfx.collect;
 
-    private void Awake()
+    private GameConfig _config;
+
+    [Inject]
+    public void Construct(GameConfig gameConfig, CollectionManager collectionManager)
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
+        _config = gameConfig;
+        _collectionManager = collectionManager;
     }
 
     private void Start()
     {
-        if (CollectionManager.Instance != null)
+        if (_collectionManager != null)
         {
-            CollectionManager.Instance.OnItemCollected += HandleItemCollected;
-        }
-        else
-        {
-            Debug.LogError("AudioManager: CollectionManager.Instance is null in Start!");
+            _collectionManager.OnItemCollected += HandleItemCollected;
         }
 
         PlayMusic();
@@ -40,8 +35,8 @@ public class AudioManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (CollectionManager.Instance != null)
-            CollectionManager.Instance.OnItemCollected -= HandleItemCollected;
+        if (_collectionManager != null)
+            _collectionManager.OnItemCollected -= HandleItemCollected;
     }
 
     //Play Collect Sound

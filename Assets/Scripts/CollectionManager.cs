@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
+
 
 /// <summary>
 /// Centralized manager for tracking collected final items.
@@ -8,9 +10,6 @@ using UnityEngine;
 /// </summary>
 public class CollectionManager : MonoBehaviour
 {
-    [SerializeField] private GameConfig _gameConfig;
-
-    public static CollectionManager Instance { get; private set; }
     public int TotalCollected { get; private set; }
 
     // Dictionary to track count per item type
@@ -28,19 +27,15 @@ public class CollectionManager : MonoBehaviour
     public event Action OnCollectionChanged;
     public event Action OnGameOver;
 
-    private void Awake()
+    private GameConfig _gameConfig;
+
+
+    [Inject]
+    public void Construct(GameConfig gameConfig)
     {
-        // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        _gameConfig = gameConfig;
     }
-
+    
     /// <summary>
     /// Register that an item has been collected
     /// </summary>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 using TMPro;
+using Zenject;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -12,10 +14,25 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject _dynamicCanvas;
 
     [SerializeField] private TMP_Text _introPanelText;
-    [SerializeField] private GameConfig _gameConfig;
+    
+    [SerializeField] private Button _startButton;
+    [SerializeField] private Button _playAgainButton;
+
+    private CollectionManager _collectionManager;
+    private GameConfig _gameConfig;
+    private GameManager _gameManager;
 
     // Reusable StringBuilder to avoid allocations
     private StringBuilder _textBuilder = new StringBuilder();
+
+    [Inject]
+    public void Construct(CollectionManager collectionManager, GameConfig gameConfig, GameManager gameManager)
+    {
+        _collectionManager = collectionManager;
+        _gameConfig = gameConfig;
+        _gameManager = gameManager;
+    }
+    
 
     public void ShowIntro() 
     { 
@@ -42,16 +59,19 @@ public class UIManager : MonoBehaviour
     }
     private void Start()
     {
-        if (GameManager.Instance != null)
+        if (_gameManager != null)
         {
-            GameManager.Instance.OnGameStarted += ShowGame;
-            GameManager.Instance.OnPlayAgain += ShowIntro;
+            _gameManager.OnGameStarted += ShowGame;
+            _gameManager.OnPlayAgain += ShowIntro;
         }
         
-        if (CollectionManager.Instance != null)
+        if (_collectionManager != null)
         {
-            CollectionManager.Instance.OnGameOver += ShowGameOver;
+            _collectionManager.OnGameOver += ShowGameOver;
         }
+
+        _startButton.onClick.AddListener(_gameManager.StartGame);
+        _playAgainButton.onClick.AddListener(_gameManager.PlayAgain);
 
         PopulateIntroText();
         
@@ -60,16 +80,19 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (GameManager.Instance != null)
+        if (_gameManager != null)
         {
-            GameManager.Instance.OnGameStarted -= ShowGame;
-            GameManager.Instance.OnPlayAgain -= ShowIntro;
+            _gameManager.OnGameStarted -= ShowGame;
+            _gameManager.OnPlayAgain -= ShowIntro;
         }
         
-        if (CollectionManager.Instance != null)
+        if (_collectionManager != null)
         {
-            CollectionManager.Instance.OnGameOver -= ShowGameOver;
+            _collectionManager.OnGameOver -= ShowGameOver;
         }
+        
+        _startButton.onClick.RemoveListener(_gameManager.StartGame);
+        _playAgainButton.onClick.RemoveListener(_gameManager.PlayAgain);
     }
 
     private void PopulateIntroText()

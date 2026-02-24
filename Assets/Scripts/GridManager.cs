@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zenject;
 
 public class GridManager : MonoBehaviour
 {
-    public static GridManager Instance { get; private set; }
-
     [Header("Grid Settings")]
     [SerializeField] private int _width = 6;
     [SerializeField] private int _height = 6;
@@ -35,15 +34,16 @@ public class GridManager : MonoBehaviour
     public Dictionary<Vector2Int, Tile> Tiles => _tiles;
     public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
 
+    private DiContainer _container;
+
+    [Inject]
+    public void Construct(DiContainer container)
+    {
+        _container = container;
+    }
+
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
         _tilesParent = new GameObject(TILES_PARENT_NAME);
         _itemsParent = new GameObject(ITEMS_PARENT_NAME);
 
@@ -55,14 +55,16 @@ public class GridManager : MonoBehaviour
             actionOnRelease: tile => tile.gameObject.SetActive(false),
             actionOnDestroy: tile => Destroy(tile.gameObject)
         );
+    }
 
+    private void Start()
+    {
         _itemPool = new ObjectPool<Item>(
-            createFunc: () => Instantiate(_itemPrefab, _itemsParent.transform),
+            createFunc: () => _container.InstantiatePrefabForComponent<Item>(_itemPrefab, _itemsParent.transform),
             actionOnGet: item => item.gameObject.SetActive(true),
             actionOnRelease: item => item.gameObject.SetActive(false),
             actionOnDestroy: item => Destroy(item.gameObject)
         );
-
     }
 
     public bool GenerateGrid()

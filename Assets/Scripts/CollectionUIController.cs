@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using TMPro;
+using Zenject;
 
 /// <summary>
 /// UI controller that listens to CollectionManager events and displays collection counts.
@@ -28,10 +29,15 @@ public class CollectionUIController : MonoBehaviour
 
     private CollectionManager _collectionManager;
 
+    [Inject]
+    public void Construct(CollectionManager collectionManager)
+    {
+        _collectionManager = collectionManager;
+    }
+
 
     private void OnEnable()
     {
-        _collectionManager = CollectionManager.Instance;
         if (_collectionManager == null) return;
 
         _collectionManager.OnItemCollected += HandleItemCollected;
