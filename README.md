@@ -65,14 +65,17 @@ Game settings can be adjusted via ScriptableObjects:
 - **TextMeshPro**: UI text rendering
 - **NUnit**: Unit testing framework
 - **Unity Event System**: Input handling
+- **DOTween**: Animation system
+- **Zenject**: Dependency injection
 
 ## Development Practices
 
 - **Version Control**: Git with .gitignore for Unity projects
-- **Testing**: Unit tests for core gameplay mechanics
+- **Testing**: Unit tests for core gameplay mechanics (sample)
 - **Documentation**: XML comments and inline documentation
 - **Code Style**: Consistent naming conventions and formatting
 - **Modular Design**: Reusable components and systems
+
 
 ## ROADMAP
 
@@ -84,8 +87,10 @@ Game settings can be adjusted via ScriptableObjects:
 - More Tests
 
 ## CREDITS
-Sound Effects
+
+### Sound Effects and Music
+
+- Background music by dyvoid: https://soundcloud.com/dyvoid
 - Meow by freesound_community: https://pixabay.com/users/freesound_community-46691455/
 - Spawner Sound by Universfield: https://pixabay.com/users/universfield-28281460/
 - Merge Items by humordome: https://pixabay.com/users/humordome-44873699/
-- Background music by dyvoid: https://soundcloud.com/dyvoid
