@@ -4,6 +4,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
+using MergeGame.Entities;
+using MergeGame.Grid;
+using MergeGame.Systems;
 
 public class TestTilesScript
 {
