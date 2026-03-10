@@ -17,6 +17,9 @@ public class GameConfig : ScriptableObject
     [Header("Visuals")]
     public Sprite backgroundSprite;
     public Color backgroundColor = Color.white;
+
+    [Header("Spawner")]
+    public Vector2Int spawnerPlacementStart = new Vector2Int(3, 3);
 }
 
 [System.Serializable]

@@ -237,16 +237,17 @@ namespace MergeGame.Grid
                 
                 if (tile.HasItem())
                 {
-                    Destroy(tile.GetItem().gameObject);
+                    ReturnItemToPool(tile.GetItem());
                     tile.ClearItem();
                 }
                 
                 if (tile.HasSpawner())
                 {
+                    // Spawners are not pooled yet, there is only one. Destroy directly.
+                    // TODO: pool spawners when multiple spawner support is added.
                     Destroy(tile.GetSpawner().gameObject);
                 }
             }
-            _itemPool.Clear();
         }
 
         private void OnDestroy()

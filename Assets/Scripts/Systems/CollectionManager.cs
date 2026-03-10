@@ -49,6 +49,12 @@ namespace MergeGame.Systems
                 return;
             }
 
+            if (_gameConfig == null)
+            {
+                Debug.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");
+                return;
+            }
+
             _collectionCounts.TryGetValue(itemData, out int currentCount);
             _collectionCounts[itemData] = currentCount + 1;
 
@@ -58,12 +64,6 @@ namespace MergeGame.Systems
 
             OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
             OnCollectionChanged?.Invoke();
-
-            if (_gameConfig == null)
-            {
-                Debug.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");
-                return;
-            }
 
             if (TotalCollected >= _gameConfig.itemsToWin)
             {
@@ -98,18 +98,6 @@ namespace MergeGame.Systems
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
             Debug.Log("CollectionManager: All counts reset");
-        }
-
-        /// <summary>
-        /// Reset count for a specific item
-        /// </summary>
-        public void ResetCount(MergeItemData itemData)
-        {
-            if (itemData != null && _collectionCounts.ContainsKey(itemData))
-            {
-                _collectionCounts.Remove(itemData);
-                OnCollectionChanged?.Invoke();
-            }
         }
     }
 }
