@@ -2,6 +2,7 @@ using Zenject;
 using UnityEngine;
 using MergeGame.Systems;
 using MergeGame.Grid;
+using MergeGame.Data;
 
 namespace MergeGame.Core
 {

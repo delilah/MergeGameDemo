@@ -1,33 +1,36 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "GameConfig", menuName = "Game/GameConfig")]
-public class GameConfig : ScriptableObject
+namespace MergeGame.Data
 {
-    [Header("Gameplay")]
-    public int itemsToWin = 7;
+    [CreateAssetMenu(fileName = "GameConfig", menuName = "Game/GameConfig")]
+    public class GameConfig : ScriptableObject
+    {
+        [Header("Gameplay")]
+        public int itemsToWin = 7;
 
-    [Header("SFX")]
-    public SfxConfig sfx;
+        [Header("SFX")]
+        public SfxConfig sfx;
 
-    [Header("Music")]
-    public AudioClip backgroundMusic;
-    public float musicVolume = 0.5f;
-    public float sfxVolume = 1f;
+        [Header("Music")]
+        public AudioClip backgroundMusic;
+        public float musicVolume = 0.5f;
+        public float sfxVolume = 1f;
 
-    [Header("Visuals")]
-    public Sprite backgroundSprite;
-    public Color backgroundColor = Color.white;
+        [Header("Visuals")]
+        public Sprite backgroundSprite;
+        public Color backgroundColor = Color.white;
 
-    [Header("Spawner")]
-    public Vector2Int spawnerPlacementStart = new Vector2Int(3, 3);
-}
+        [Header("Spawner")]
+        public Vector2Int spawnerPlacementStart = new Vector2Int(3, 3);
+    }
 
-[System.Serializable]
-public class SfxConfig
-{
-    public AudioClip spawnerClick;
-    public AudioClip merge;
-    public AudioClip mergeItems;
-    public AudioClip mergeKittens;
-    public AudioClip collect;
+    [System.Serializable]
+    public class SfxConfig
+    {
+        public AudioClip spawnerClick;
+        public AudioClip merge;
+        public AudioClip mergeItems;
+        public AudioClip mergeKittens;
+        public AudioClip collect;
+    }
 }

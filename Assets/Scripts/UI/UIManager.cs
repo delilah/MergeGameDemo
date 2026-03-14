@@ -5,6 +5,7 @@ using Zenject;
 using UnityEngine.UI;
 using MergeGame.Core;
 using MergeGame.Systems;
+using MergeGame.Data;
  
 namespace MergeGame.UI
 {
@@ -78,7 +79,7 @@ namespace MergeGame.UI
             
             if (_collectionManager != null)
             {
-                _collectionManager.OnGameOver += ShowGameOver;
+                _collectionManager.OnWinConditionMet += ShowGameOver;
             }
 
             _startButton.onClick.AddListener(_gameManager.StartGame);
@@ -99,7 +100,7 @@ namespace MergeGame.UI
             
             if (_collectionManager != null)
             {
-                _collectionManager.OnGameOver -= ShowGameOver;
+                _collectionManager.OnWinConditionMet -= ShowGameOver;
             }
             
             _startButton.onClick.RemoveListener(_gameManager.StartGame);

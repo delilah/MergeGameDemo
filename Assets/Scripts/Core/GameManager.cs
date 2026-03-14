@@ -38,7 +38,7 @@ namespace MergeGame.Core
 
         private void Start()
         {
-            _collectionManager.OnGameOver += GameOver;
+            _collectionManager.OnWinConditionMet += GameOver;
         }
 
         private void Update()
@@ -109,7 +109,7 @@ namespace MergeGame.Core
         /// </summary>
         public void PlayAgain()
         {
-            _collectionManager.ResetAllCounts();
+            _collectionManager.Reset();
             _gridManager.ClearGrid();
             OnPlayAgain?.Invoke();
         }
@@ -127,7 +127,7 @@ namespace MergeGame.Core
         {
             if (_collectionManager != null)
             {
-                _collectionManager.OnGameOver -= GameOver;
+                _collectionManager.OnWinConditionMet -= GameOver;
             }
         }
     }

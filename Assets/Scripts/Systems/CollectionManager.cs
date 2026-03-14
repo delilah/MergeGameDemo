@@ -15,20 +15,22 @@ namespace MergeGame.Systems
     {
         public int TotalCollected { get; private set; }
 
+        private bool _gameOver;
+
         /// <summary>
         /// Event fired when an item is collected.
-        /// Parameters: (MergeItemData itemData, int newTotalCount)
+        /// Parameters: (MergeItemData itemData, int newCountForThatItem, Vector3 worldPosition)
         /// </summary>
         public event Action<MergeItemData, int, Vector3> OnItemCollected;
 
         /// <summary>
-        /// Event fired when any collection count changes (useful for UI refresh)
+        /// Event fired on any count change - useful for driving UI refreshes.
         /// </summary>
         public event Action OnCollectionChanged;
-        public event Action OnGameOver;
+        public event Action OnWinConditionMet;
 
        // Dictionary to track count per item type
-        private Dictionary<MergeItemData, int> _collectionCounts = new Dictionary<MergeItemData, int>();
+        private readonly Dictionary<MergeItemData, int> _collectionCounts = new Dictionary<MergeItemData, int>();
 
         private GameConfig _gameConfig;
 
@@ -43,6 +45,8 @@ namespace MergeGame.Systems
         /// </summary>
         public void Collect(MergeItemData itemData, Vector3 worldPosition)
         {
+            if (_gameOver) return;
+
             if (itemData == null)
             {
                 Debug.LogWarning("CollectionManager: Attempted to collect null item data");
@@ -61,17 +65,23 @@ namespace MergeGame.Systems
             TotalCollected++;
 
             #if UNITY_EDITOR
-            Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {currentCount + 1}");
+            Debug.Log($"CollectionManager: Collected {itemData.itemName}. Item count: {currentCount + 1}");
             #endif
 
             OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
             OnCollectionChanged?.Invoke();
 
-            if (TotalCollected >= _gameConfig.itemsToWin)
-            {
-                OnGameOver?.Invoke();
-            }
+            CheckWinCondition();
         }         
+
+        private void CheckWinCondition()
+        {
+            if (!_gameOver && TotalCollected >= _gameConfig.itemsToWin)
+            {
+                _gameOver = true;
+                OnWinConditionMet?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Get the collection count for a specific item type
@@ -94,8 +104,9 @@ namespace MergeGame.Systems
         /// <summary>
         /// Reset all collection counts (useful for new game)
         /// </summary>
-        public void ResetAllCounts()
+        public void Reset()
         {
+            _gameOver = false;
             _collectionCounts.Clear();
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
