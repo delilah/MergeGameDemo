@@ -98,7 +98,6 @@ namespace MergeGame.Grid
                 Tile tile = child.GetComponent<Tile>();
                 if (tile != null)
                 {
-                    tile.gameObject.SetActive(false);
                     _tilePool.Release(tile);
                 }
             }
