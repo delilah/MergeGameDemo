@@ -1,8 +1,7 @@
 using UnityEngine;
 
-namespace MergeGame.Systems
+namespace MergeGame.MergeDebug
 {
-
     /// <summary>
     /// Persistent debug controller. Add to a GameObject in your scene.
     /// Provides a single toggle for all debug logs with automatic build exclusion.
@@ -38,7 +37,7 @@ namespace MergeGame.Systems
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_instance != null && _instance._enableDebugLogs)
             {
-                Debug.Log(message);
+                UnityEngine.Debug.Log(message);
             }
             #endif
         }
@@ -51,7 +50,7 @@ namespace MergeGame.Systems
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_instance != null && _instance._enableDebugLogs)
             {
-                Debug.LogWarning(message);
+                UnityEngine.Debug.LogWarning(message);
             }
             #endif
         }
@@ -61,7 +60,7 @@ namespace MergeGame.Systems
         /// </summary>
         public static void LogError(string message)
         {
-            Debug.LogError(message);
+            UnityEngine.Debug.LogError(message);
         }
         
         /// <summary>

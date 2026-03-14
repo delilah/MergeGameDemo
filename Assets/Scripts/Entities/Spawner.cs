@@ -5,6 +5,7 @@ using DG.Tweening;
 using Zenject;
 using MergeGame.Grid;
 using MergeGame.Systems;
+using MergeGame.Data;
 
 namespace MergeGame.Entities
 {

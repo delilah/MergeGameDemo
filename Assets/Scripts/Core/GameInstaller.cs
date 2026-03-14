@@ -13,8 +13,6 @@ namespace MergeGame.Core
         [SerializeField] private GridManager _gridManagerPrefab;
         [SerializeField] private CollectionManager _collectionManagerPrefab;
 
-        
-
         public override void InstallBindings()
         {
             // Bind GameConfig as a singleton

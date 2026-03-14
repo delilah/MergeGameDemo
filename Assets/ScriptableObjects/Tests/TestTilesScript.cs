@@ -7,6 +7,7 @@ using Object = UnityEngine.Object;
 using MergeGame.Entities;
 using MergeGame.Grid;
 using MergeGame.Systems;
+using MergeGame.Data;
 
 public class TestTilesScript
 {

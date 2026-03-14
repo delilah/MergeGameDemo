@@ -5,10 +5,10 @@ using Zenject;
 using MergeGame.Grid;
 using MergeGame.Systems;
 using MergeGame.Interfaces;
+using MergeGame.Data;
  
 namespace MergeGame.Entities
 {
-
     public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     {
         // Static event works for a single-scene game
@@ -132,6 +132,7 @@ namespace MergeGame.Entities
             }
             else
             {
+                
                 Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
             }
         }

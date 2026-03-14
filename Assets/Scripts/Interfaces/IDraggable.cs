@@ -4,7 +4,6 @@ using MergeGame.Grid;
  
 namespace MergeGame.Interfaces
 {
-        
     public interface IDraggable : IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         /// <summary>

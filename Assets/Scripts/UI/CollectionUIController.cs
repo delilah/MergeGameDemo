@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Zenject;
 using MergeGame.Systems;
+using MergeGame.Data;
  
 namespace MergeGame.UI
 {
@@ -19,7 +20,6 @@ namespace MergeGame.UI
         // triggering full Canvas rebuilds on static elements when collection updates.
         // Updated via StringBuilder to avoid per-frame string allocations on mobile.
         [SerializeField] private TMP_Text _collectionText;
-        // [SerializeField] private TMP_Text _itemCollectedPopupText; // TODO: implement floating text
 
         [Header("Effects")]
         [SerializeField] private ParticleSystem _collectParticlesPrefab;

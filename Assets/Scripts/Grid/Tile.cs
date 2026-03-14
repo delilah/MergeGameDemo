@@ -15,12 +15,6 @@ namespace MergeGame.Grid
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private GameObject _highlight;
 
-        private Item _currentItem;
-        private Spawner _currentSpawner;
-        private const float _spritePadding = .95f;
-        private Vector2Int _gridPosition;
-        private GridManager _gridManager;
-
         public bool HasItem() => _currentItem != null;
         public Item GetItem() => _currentItem;
         public bool HasSpawner() => _currentSpawner != null;
@@ -28,6 +22,12 @@ namespace MergeGame.Grid
 
         // True only when the tile has no item AND no spawner on it.
         public bool IsEmpty => _currentSpawner == null && _currentItem == null;
+
+        private Item _currentItem;
+        private Spawner _currentSpawner;
+        private const float _spritePadding = .95f;
+        private Vector2Int _gridPosition;
+        private GridManager _gridManager;
 
         public void Init(bool isAlternateTile)
         {

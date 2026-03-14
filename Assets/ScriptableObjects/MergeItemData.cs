@@ -1,11 +1,13 @@
 using UnityEngine;
-
-[CreateAssetMenu(menuName = "Data/Merge Item Data")]
-public class MergeItemData : ScriptableObject
+namespace MergeGame.Data
 {
-    public string itemName;
-    public int level;
-    public Sprite sprite;
-    public MergeItemData nextItem;
-    public bool isFinal;
+    [CreateAssetMenu(menuName = "Data/Merge Item Data")]
+    public class MergeItemData : ScriptableObject
+    {
+        public string itemName;
+        public int level;
+        public Sprite sprite;
+        public MergeItemData nextItem;
+        public bool isFinal;
+    }
 }

@@ -4,10 +4,10 @@ using Zenject;
 using MergeGame.Systems;
 using MergeGame.Grid;
 using MergeGame.Entities;
+using MergeGame.Data;
 
 namespace MergeGame.Core
 {
-        
     public class GameManager : MonoBehaviour
     {    
         [SerializeField] private Spawner _spawnerPrefab; // generic prefab
@@ -51,6 +51,9 @@ namespace MergeGame.Core
             }
         }
 
+        /// <summary>
+        /// Places the test spawner at the configured position.
+        /// </summary>
         private void PlaceTestSpawner()
         {
             Vector2Int pos = _gameConfig.spawnerPlacementStart;
@@ -76,6 +79,9 @@ namespace MergeGame.Core
             tile.PlaceSpawner(spawner);
         }
 
+        /// <summary>
+        /// Starts the game by loading the grid and placing the test spawner.
+        /// </summary>
         public void StartGame()
         {
             if (!LoadGame()) return;
@@ -83,6 +89,10 @@ namespace MergeGame.Core
             OnGameStarted?.Invoke();
         }
 
+        /// <summary>
+        /// Loads the game by generating the grid and placing the test spawner.
+        /// </summary>
+        /// <returns>True if the game was loaded successfully, false otherwise.</returns>
         public bool LoadGame()
         {
             if (!_gridManager.GenerateGrid())
@@ -94,6 +104,9 @@ namespace MergeGame.Core
             return true;
         }
 
+        /// <summary>
+        /// Resets the game by clearing the grid and resetting all counts.
+        /// </summary>
         public void PlayAgain()
         {
             _collectionManager.ResetAllCounts();
@@ -101,6 +114,9 @@ namespace MergeGame.Core
             OnPlayAgain?.Invoke();
         }
 
+        /// <summary>
+        /// Handles the game over event by deactivating game objects.
+        /// </summary>
         public void GameOver()
         {
             _gridManager.SetGameObjectsActive(false);

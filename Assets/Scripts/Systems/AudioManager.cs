@@ -1,5 +1,6 @@
 using UnityEngine;
 using Zenject;
+using MergeGame.Data;
 
 namespace MergeGame.Systems
 {

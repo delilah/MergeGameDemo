@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using MergeGame.Data;
 
 namespace MergeGame.Systems
 {
-
     /// <summary>
     /// Centralized manager for tracking collected final items.
     /// Uses Action events for decoupled architecture.
@@ -60,7 +60,9 @@ namespace MergeGame.Systems
 
             TotalCollected++;
 
+            #if UNITY_EDITOR
             Debug.Log($"CollectionManager: Collected {itemData.itemName}. Total: {currentCount + 1}");
+            #endif
 
             OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
             OnCollectionChanged?.Invoke();
@@ -97,7 +99,10 @@ namespace MergeGame.Systems
             _collectionCounts.Clear();
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
+
+            #if UNITY_EDITOR
             Debug.Log("CollectionManager: All counts reset");
+            #endif
         }
     }
 }

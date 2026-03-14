@@ -1,9 +1,13 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-public class Debugclick : MonoBehaviour, IPointerClickHandler
+
+namespace MergeGame.MergeDebug
 {
-    public void OnPointerClick(PointerEventData eventData)
+    public class DebugClick : MonoBehaviour, IPointerClickHandler
     {
-        Debug.Log("Clicked on " + gameObject.name);
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            Debug.Log("Clicked on " + gameObject.name);
+        }
     }
 }

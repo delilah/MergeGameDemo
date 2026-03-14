@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 using TMPro;
@@ -10,7 +8,6 @@ using MergeGame.Systems;
  
 namespace MergeGame.UI
 {
-
     public class UIManager : MonoBehaviour
     {
         [SerializeField] private GameObject _introPanel;
@@ -38,7 +35,9 @@ namespace MergeGame.UI
             _gameManager = gameManager;
         }
         
-
+        /// <summary>
+        /// Show the intro panel
+        /// </summary>
         public void ShowIntro() 
         { 
             _introPanel.SetActive(true); 
@@ -47,6 +46,9 @@ namespace MergeGame.UI
             _dynamicCanvas.SetActive(false); 
         }
 
+        /// <summary>
+        /// Show the game panel
+        /// </summary>
         public void ShowGame() 
         { 
             _introPanel.SetActive(false); 
@@ -55,6 +57,9 @@ namespace MergeGame.UI
             _dynamicCanvas.SetActive(true); 
         }
 
+        /// <summary>
+        /// Show the game over panel
+        /// </summary>
         public void ShowGameOver() 
         { 
             _introPanel.SetActive(false); 
@@ -62,6 +67,7 @@ namespace MergeGame.UI
             _gameOverPanel.SetActive(true); 
             _dynamicCanvas.SetActive(false); 
         }
+        
         private void Start()
         {
             if (_gameManager != null)

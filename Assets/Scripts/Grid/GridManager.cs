@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;
 using MergeGame.Entities;
+using MergeGame.Data;
 
 namespace MergeGame.Grid
 {
@@ -21,6 +22,9 @@ namespace MergeGame.Grid
         [Header("Item Prefab")]
         [SerializeField] private Item _itemPrefab;
 
+        public Dictionary<Vector2Int, Tile> Tiles => _tiles;
+        public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
+
         private Dictionary<Vector2Int, Tile> _tiles;
         private GameObject _tilesParent;
 
@@ -33,10 +37,6 @@ namespace MergeGame.Grid
 
         private float _tileSize;
         private Vector2 _startPos;
-
-        public Dictionary<Vector2Int, Tile> Tiles => _tiles;
-        public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
-
         private DiContainer _container;
 
         [Inject]
@@ -58,10 +58,7 @@ namespace MergeGame.Grid
                 actionOnRelease: tile => tile.gameObject.SetActive(false),
                 actionOnDestroy: tile => Destroy(tile.gameObject)
             );
-        }
 
-        private void Start()
-        {
             _itemPool = new ObjectPool<Item>(
                 createFunc: () => _container.InstantiatePrefabForComponent<Item>(_itemPrefab, _itemsParent.transform),
                 actionOnGet: item => item.gameObject.SetActive(true),
@@ -70,9 +67,12 @@ namespace MergeGame.Grid
             );
         }
 
+        /// <summary>
+        /// Generates the grid by creating tiles and setting their positions.
+        /// </summary>
+        /// <returns>True if the grid was generated successfully, false otherwise.</returns>
         public bool GenerateGrid()
         {
-
             Camera mainCam = Camera.main;
             if (mainCam == null)
             {
@@ -158,6 +158,11 @@ namespace MergeGame.Grid
             return tile;
         }
 
+        /// <summary>
+        /// Gets the tile at the given world position.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <returns>The tile at the given world position, or null if the position is outside the grid.</returns>
         public Tile GetTileAtWorldPosition(Vector3 worldPos)
         {
             if (_tileSize <= 0f) return null;
@@ -172,7 +177,12 @@ namespace MergeGame.Grid
             return GetTileAtPosition(new Vector2Int(x, y));
         }
 
-        // ---------- SPAWN ITEM ----------
+        /// <summary>
+        /// Spawns an item at the given grid position.
+        /// </summary>
+        /// <param name="data">The item data.</param>
+        /// <param name="gridPos">The grid position.</param>
+        /// <returns>The spawned item, or null if the position is invalid or occupied.</returns>
         public Item SpawnItem(MergeItemData data, Vector2Int gridPos)
         {
             if (_itemPrefab == null)
@@ -201,6 +211,10 @@ namespace MergeGame.Grid
 
         private Item GetItemFromPool() => _itemPool.Get();
 
+        /// <summary>
+        /// Returns an item to the pool.
+        /// </summary>
+        /// <param name="item">The item to return.</param>
         public void ReturnItemToPool(Item item)
         {
             if (item == null) return;
@@ -208,11 +222,19 @@ namespace MergeGame.Grid
             _itemPool.Release(item); // handles SetActive(false) automatically
         }
 
+        /// <summary>
+        /// Marks a tile as occupied.
+        /// </summary>
+        /// <param name="gridPos">The grid position.</param>
         public void MarkTileOccupied(Vector2Int gridPos)
         {
             _freeTilePositions.Remove(gridPos);
         }
 
+        /// <summary>
+        /// Marks a tile as free.
+        /// </summary>
+        /// <param name="gridPos">The grid position.</param>
         public void MarkTileFree(Vector2Int gridPos)
         {
             if (!_freeTilePositions.Contains(gridPos))
@@ -220,13 +242,20 @@ namespace MergeGame.Grid
                 _freeTilePositions.Add(gridPos);
             }
         }
-
+        
+        /// <summary>
+        /// Sets the active state of the grid game objects.
+        /// </summary>
+        /// <param name="active">Whether the game objects should be active.</param>
         public void SetGameObjectsActive(bool active)
         {
             _tilesParent.SetActive(active);
             _itemsParent.SetActive(active);
         }
 
+        /// <summary>
+        /// Clears the grid by returning all items to the pool and destroying spawners.
+        /// </summary>
         public void ClearGrid()
         {
             if (_tiles == null) return;
