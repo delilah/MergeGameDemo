@@ -48,12 +48,20 @@ namespace MergeGame.Systems
             PlaySfx(_config?.sfx.collect);
         }
 
+        /// <summary>
+        /// Play a sound effect
+        /// </summary>
+        /// <param name="clip">The audio clip to play</param>
         public void PlaySfx(AudioClip clip)
         {
             if (clip == null || _sfxSource == null) return;
             _sfxSource.PlayOneShot(clip, _config.sfxVolume);
         }
 
+        /// <summary>
+        /// Play a merge sound based on the level
+        /// </summary>
+        /// <param name="level">The level of the merge</param>
         public void PlayMergeSound(int level)
         {
             if (level == 0)

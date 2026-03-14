@@ -70,7 +70,11 @@ namespace MergeGame.Grid
 
         public void PlaceItem(Item item)
         {
-            Debug.Assert(_gridManager != null, $"GridManager is null on tile {name}: was SetGridPosition called?");
+            if (_gridManager == null)
+            {
+                Debug.LogError($"GridManager is null on tile {name}: was SetGridPosition called?");
+                return;
+            }
 
             _currentItem = item;
             if (item == null) return;
@@ -86,7 +90,11 @@ namespace MergeGame.Grid
 
         public void RemoveItem()
         {
-            Debug.Assert(_gridManager != null, $"GridManager is null on tile {name}: was SetGridPosition called?");
+            if (_gridManager == null)
+            {
+                Debug.LogError($"GridManager is null on tile {name}: was SetGridPosition called?");
+                return;
+            }
 
             _currentItem = null;
 
