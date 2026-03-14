@@ -229,7 +229,7 @@ namespace MergeGame.Entities
             int currentLevel = targetItem.Data.level;
             
             // Play merge sound based on level
-            _audioManager.PlayMergeSound(currentLevel);
+            _audioManager.PlayMergeSoundForLevel(currentLevel);
 
             ReturnToPool();
 

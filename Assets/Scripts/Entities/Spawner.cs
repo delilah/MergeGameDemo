@@ -125,7 +125,7 @@ namespace MergeGame.Entities
             StopIntroSpawnerAnimation();
             OnSpawnerTouchAnimation();
 
-            _audioManager?.PlaySfx(_audioManager.SpawnerClickSound);
+            _audioManager.PlaySpawnerClick();
 
             if (_active != this)
             {

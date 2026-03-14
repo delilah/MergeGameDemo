@@ -4,20 +4,15 @@ using MergeGame.Data;
 
 namespace MergeGame.Systems
 {
-
     public class AudioManager : MonoBehaviour
     {
         [SerializeField] private AudioSource _sfxSource;
         [SerializeField] private AudioSource _musicSource;
 
-        public AudioClip SpawnerClickSound => _config?.sfx.spawnerClick;
-        public AudioClip MergeSound => _config?.sfx.merge;
-        public AudioClip MergeSoundItems => _config?.sfx.mergeItems;
-        public AudioClip MergeSoundKittens => _config?.sfx.mergeKittens;
-        public AudioClip CollectSound => _config?.sfx.collect;
-
         private CollectionManager _collectionManager;
         private GameConfig _config;
+
+        public enum MergeCategory { Items, Kittens, Generic }
 
         [Inject]
         public void Construct(GameConfig gameConfig, CollectionManager collectionManager)
@@ -29,9 +24,7 @@ namespace MergeGame.Systems
         private void Start()
         {
             if (_collectionManager != null)
-            {
                 _collectionManager.OnItemCollected += HandleItemCollected;
-            }
 
             PlayMusic();
         }
@@ -42,39 +35,65 @@ namespace MergeGame.Systems
                 _collectionManager.OnItemCollected -= HandleItemCollected;
         }
 
-        //Play Collect Sound
-        private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)
+
+        /// <summary>
+        /// Plays a spawner click sound
+        /// </summary>
+        public void PlaySpawnerClick() => PlaySfx(_config?.sfx.spawnerClick);
+        
+        /// <summary>
+        /// Plays a collect sound
+        /// </summary>
+        public void PlayCollect() => PlaySfx(_config?.sfx.collect);
+        
+        /// <summary>
+        /// Plays a merge sound
+        /// </summary>
+        public void PlayMerge() => PlaySfx(_config?.sfx.merge);
+
+        /// <summary>
+        /// Plays a merge sound based on the level
+        /// </summary>
+        /// <param name="level">The level of the merge</param>
+        public void PlayMergeSoundForLevel(int level)
         {
-            PlaySfx(_config?.sfx.collect);
+            var category = level switch
+            {
+                0 => MergeCategory.Items,
+                1 => MergeCategory.Kittens,
+                _ => MergeCategory.Generic
+            };
+            PlayMergeSound(category);
+        }
+
+        private void PlayMergeSound(MergeCategory category)
+        {
+            switch (category)
+            {
+                case MergeCategory.Items:   PlaySfx(_config?.sfx.mergeItems);   break;
+                case MergeCategory.Kittens: PlaySfx(_config?.sfx.mergeKittens); break;
+                default:                    PlaySfx(_config?.sfx.merge);        break;
+            }
         }
 
         /// <summary>
-        /// Play a sound effect
+        /// Plays a sound effect
         /// </summary>
-        /// <param name="clip">The audio clip to play</param>
+        /// <param name="clip">The sound effect to play</param>
         public void PlaySfx(AudioClip clip)
         {
             if (clip == null || _sfxSource == null) return;
-            _sfxSource.PlayOneShot(clip, _config.sfxVolume);
+            _sfxSource.PlayOneShot(clip, _config?.sfxVolume ?? 1f);
         }
 
-        /// <summary>
-        /// Play a merge sound based on the level
-        /// </summary>
-        /// <param name="level">The level of the merge</param>
-        public void PlayMergeSound(int level)
+        private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)
         {
-            if (level == 0)
-                PlaySfx(_config.sfx.mergeItems);
-            else if (level == 1)
-                PlaySfx(_config.sfx.mergeKittens);
-            else 
-                PlaySfx(_config.sfx.merge);
+            PlayCollect();
         }
 
         private void PlayMusic()
         {
-            if (_config == null || _config.backgroundMusic == null) return;
+            if (_config == null || _config.backgroundMusic == null || _musicSource == null) return;
             _musicSource.clip = _config.backgroundMusic;
             _musicSource.volume = _config.musicVolume;
             _musicSource.loop = true;
