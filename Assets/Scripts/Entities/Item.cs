@@ -11,10 +11,6 @@ namespace MergeGame.Entities
 {
     public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
     {
-        // Static event works for a single-scene game
-        // TODO: Replace with injected callback if scene management becomes more complex
-        public static UnityEvent<Item> OnItemReturnRequested = new UnityEvent<Item>();
-
         [Header("References")]
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private BoxCollider2D _collider;
@@ -247,7 +243,7 @@ namespace MergeGame.Entities
         {
             _currentTile?.RemoveItem();
             ClearTile();
-            OnItemReturnRequested.Invoke(this);
+            _gridManager.ReturnItemToPool(this);
         }
 
     }

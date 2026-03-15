@@ -50,8 +50,6 @@ namespace MergeGame.Grid
             _tilesParent = new GameObject(TILES_PARENT_NAME);
             _itemsParent = new GameObject(ITEMS_PARENT_NAME);
 
-            Item.OnItemReturnRequested.AddListener(ReturnItemToPool);
-
             _tilePool = new ObjectPool<Tile>(
                 createFunc: () => Instantiate(_tilePrefab, _tilesParent.transform),
                 actionOnGet: tile => tile.gameObject.SetActive(true),
@@ -86,13 +84,19 @@ namespace MergeGame.Grid
                 return false;
             }
 
-            if (_tiles == null) _tiles = new Dictionary<Vector2Int, Tile>();
-            else _tiles.Clear();
+            if (_tiles == null) 
+            {
+                _tiles = new Dictionary<Vector2Int, Tile>();
+            }
+            else 
+            {
+                _tiles.Clear();
+            }
 
             // clear free positions to avoid duplicates on regeneration
             _freeTilePositions.Clear();
 
-            // Pool existing tiles
+            // Pool existing tiles: SetActive(false) is handled by actionOnRelease
             foreach (Transform child in _tilesParent.transform)
             {
                 Tile tile = child.GetComponent<Tile>();
@@ -164,7 +168,10 @@ namespace MergeGame.Grid
         /// <returns>The tile at the given world position, or null if the position is outside the grid.</returns>
         public Tile GetTileAtWorldPosition(Vector3 worldPos)
         {
-            if (_tileSize <= 0f) return null;
+            if (_tileSize <= 0f) 
+            {
+                return null;
+            }
 
             int x = Mathf.RoundToInt((worldPos.x - _startPos.x) / _tileSize);
             int y = Mathf.RoundToInt((worldPos.y - _startPos.y) / _tileSize);
@@ -257,11 +264,17 @@ namespace MergeGame.Grid
         /// </summary>
         public void ClearGrid()
         {
-            if (_tiles == null) return;
+            if (_tiles == null) 
+            {
+                return;
+            }
             
             foreach (Tile tile in _tiles.Values)
             {
-                if (tile == null) continue;
+                if (tile == null) 
+                {
+                    continue;
+                }
                 
                 if (tile.HasItem())
                 {
@@ -278,9 +291,5 @@ namespace MergeGame.Grid
             }
         }
 
-        private void OnDestroy()
-        {
-            Item.OnItemReturnRequested.RemoveListener(ReturnItemToPool);
-        }
     }
 }
