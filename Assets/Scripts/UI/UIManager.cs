@@ -68,19 +68,16 @@ namespace MergeGame.UI
             _gameOverPanel.SetActive(true); 
             _dynamicCanvas.SetActive(false); 
         }
-        
+
         private void Start()
         {
-            if (_gameManager != null)
-            {
-                _gameManager.OnGameStarted += ShowGame;
-                _gameManager.OnPlayAgain += ShowIntro;
-            }
-            
-            if (_collectionManager != null)
-            {
-                _collectionManager.OnWinConditionMet += ShowGameOver;
-            }
+            if (_startButton == null) Debug.LogError("UIManager: _startButton is not assigned.");
+            if (_playAgainButton == null) Debug.LogError("UIManager: _playAgainButton is not assigned.");
+
+            // Note: _gameManager and _collectionManager are guarded by Zenject against null
+            _gameManager.OnGameStarted += ShowGame;
+            _gameManager.OnPlayAgain += ShowIntro;
+            _collectionManager.OnWinConditionMet += ShowGameOver;
 
             _startButton.onClick.AddListener(_gameManager.StartGame);
             _playAgainButton.onClick.AddListener(_gameManager.PlayAgain);

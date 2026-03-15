@@ -104,19 +104,6 @@ namespace MergeGame.Grid
                 _gridManager.MarkTileFree(_gridPosition);
             }
         }
-
-        public void ClearItem()
-        {
-            if (_currentItem != null)
-            {
-                _currentItem = null;
-            }
-            
-            if (_gridManager != null && !HasSpawner())
-            {
-                _gridManager.MarkTileFree(_gridPosition);
-            }
-        }
         
         private void PlaceObject(Transform objTransform, Vector3 localOffset)
         {

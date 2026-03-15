@@ -18,6 +18,13 @@ namespace MergeGame.Core
 
         public override void InstallBindings()
         {
+            if (_gameConfig == null) throw new System.Exception("GameInstaller: _gameConfig is not assigned.");
+            if (_audioManagerPrefab == null) throw new System.Exception("GameInstaller: _audioManagerPrefab is not assigned.");
+            if (_gameManagerPrefab == null) throw new System.Exception("GameInstaller: _gameManagerPrefab is not assigned.");
+            if (_gridManagerPrefab == null) throw new System.Exception("GameInstaller: _gridManagerPrefab is not assigned.");
+            if (_collectionManagerPrefab == null) throw new System.Exception("GameInstaller: _collectionManagerPrefab is not assigned.");
+            if (_itemManagerPrefab == null) throw new System.Exception("GameInstaller: _itemManagerPrefab is not assigned.");
+
             // Bind GameConfig as a singleton
             Container.BindInstance(_gameConfig).AsSingle();
 
