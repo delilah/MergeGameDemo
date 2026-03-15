@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnerPrefab: {fileID: -5940444232139732460, guid: 0644ba4aa3ae7bf4b9353fa692ec7b83, type: 3}
+  _initialSpawnerData: {fileID: 11400000, guid: 6a7dd483489fd2a4a894a02fac0789ce, type: 2}
