@@ -3,6 +3,7 @@ using UnityEngine;
 using MergeGame.Systems;
 using MergeGame.Grid;
 using MergeGame.Data;
+using MergeGame.Entities;
 
 namespace MergeGame.Core
 {
@@ -13,18 +14,19 @@ namespace MergeGame.Core
         [SerializeField] private GameManager _gameManagerPrefab;
         [SerializeField] private GridManager _gridManagerPrefab;
         [SerializeField] private CollectionManager _collectionManagerPrefab;
+        [SerializeField] private ItemManager _itemManagerPrefab;
 
         public override void InstallBindings()
         {
             // Bind GameConfig as a singleton
             Container.BindInstance(_gameConfig).AsSingle();
-            
+
             // Bind managers as singletons
             Container.Bind<AudioManager>().FromComponentInNewPrefab(_audioManagerPrefab).AsSingle();
             Container.Bind<GameManager>().FromComponentInNewPrefab(_gameManagerPrefab).AsSingle();
             Container.Bind<CollectionManager>().FromComponentInNewPrefab(_collectionManagerPrefab).AsSingle();
             Container.Bind<GridManager>().FromComponentInNewPrefab(_gridManagerPrefab).AsSingle();
-        
+            Container.Bind<ItemManager>().FromComponentInNewPrefab(_itemManagerPrefab).AsSingle();
         }
     }
 }

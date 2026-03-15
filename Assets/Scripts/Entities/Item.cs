@@ -1,12 +1,11 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Zenject;
 using MergeGame.Grid;
 using MergeGame.Systems;
 using MergeGame.Interfaces;
 using MergeGame.Data;
- 
+
 namespace MergeGame.Entities
 {
     public class Item : MonoBehaviour, IDraggable, IPointerDownHandler
@@ -28,17 +27,19 @@ namespace MergeGame.Entities
         private AudioManager _audioManager;
         private CollectionManager _collectionManager;
         private GridManager _gridManager;
+        private ItemManager _itemManager;
 
         private const int DRAG_SORTING_ORDER_OFFSET = 20;
-        
+
         [Inject]
-        public void Construct(AudioManager audioManager, CollectionManager collectionManager, GridManager gridManager)
+        public void Construct(AudioManager audioManager, CollectionManager collectionManager, GridManager gridManager, ItemManager itemManager)
         {
             _audioManager = audioManager;
             _collectionManager = collectionManager;
-            _gridManager = gridManager;
+            _gridManager = gridManager;   // needed for drag-and-drop (GetTileAtWorldPosition)
+            _itemManager = itemManager;   // handles pool return
         }
-        
+
         public void Initialize(MergeItemData data, Tile tile)
         {
             _data = data;
@@ -86,18 +87,21 @@ namespace MergeGame.Entities
             {
                 _collider = GetComponent<BoxCollider2D>();
             }
-                
+
             if (_collider == null)
             {
                 _collider = gameObject.AddComponent<BoxCollider2D>();
             }
-                
+
             EnsureColliderSized();
         }
 
         private void EnsureColliderSized()
         {
-            if (_collider == null) return;
+            if (_collider == null)
+            {
+                return;
+            }
 
             if (_spriteRenderer != null && _spriteRenderer.sprite != null)
             {
@@ -128,7 +132,6 @@ namespace MergeGame.Entities
             }
             else
             {
-                
                 Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
             }
         }
@@ -179,7 +182,7 @@ namespace MergeGame.Entities
 
         public bool OnDrop(Tile targetTile)
         {
-            if (targetTile == null) 
+            if (targetTile == null)
             {
                 return false;
             }
@@ -187,7 +190,7 @@ namespace MergeGame.Entities
             if (targetTile.HasSpawner())
             {
                 return false;
-            } 
+            }
 
             Item targetItem = targetTile.GetItem();
             if (targetItem == null)
@@ -223,7 +226,7 @@ namespace MergeGame.Entities
 
             // Get current level before merging
             int currentLevel = targetItem.Data.level;
-            
+
             // Play merge sound based on level
             _audioManager.PlayMergeSoundForLevel(currentLevel);
 
@@ -243,8 +246,7 @@ namespace MergeGame.Entities
         {
             _currentTile?.RemoveItem();
             ClearTile();
-            _gridManager.ReturnItemToPool(this);
+            _itemManager.ReturnItemToPool(this);
         }
-
     }
 }

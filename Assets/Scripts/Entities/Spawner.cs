@@ -26,13 +26,15 @@ namespace MergeGame.Entities
         private Vector3 _baseScale;
 
         private AudioManager _audioManager;
-        private GridManager _gridManager;
-        
-        [Inject] 
-        public void Construct(AudioManager audioManager, GridManager gridManager)
+        private GridManager _gridManager;   // needed for FreeTilePositions
+        private ItemManager _itemManager;   // handles spawning
+
+        [Inject]
+        public void Construct(AudioManager audioManager, GridManager gridManager, ItemManager itemManager)
         {
             _audioManager = audioManager;
             _gridManager = gridManager;
+            _itemManager = itemManager;
         }
 
         private static Spawner _active;
@@ -67,10 +69,25 @@ namespace MergeGame.Entities
 
         private void Awake()
         {
-            if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
-            if (_collider == null) _collider = GetComponent<Collider2D>();
-            if (_collider == null) _collider = GetComponentInChildren<Collider2D>();
-            if (_collider == null) _collider = gameObject.AddComponent<BoxCollider2D>();
+            if (_spriteRenderer == null)
+            {
+                _spriteRenderer = GetComponent<SpriteRenderer>();
+            }
+
+            if (_collider == null)
+            {
+                _collider = GetComponent<Collider2D>();
+            }
+
+            if (_collider == null)
+            {
+                _collider = GetComponentInChildren<Collider2D>();
+            }
+
+            if (_collider == null)
+            {
+                _collider = gameObject.AddComponent<BoxCollider2D>();
+            }
 
             _tile = GetComponentInParent<Tile>();
 
@@ -163,9 +180,9 @@ namespace MergeGame.Entities
                 return;
             }
 
-            if (_gridManager == null)
+            if (_itemManager == null)
             {
-                Debug.LogWarning("GridManager not ready; cannot spawn.");
+                Debug.LogWarning("ItemManager not ready; cannot spawn.");
                 return;
             }
 
@@ -188,7 +205,7 @@ namespace MergeGame.Entities
             int tileIdx = Random.Range(0, freeTiles.Count);
             Vector2Int gridPos = freeTiles[tileIdx];
 
-            _gridManager.SpawnItem(itemData, gridPos);
+            _itemManager.SpawnItem(itemData, gridPos);
 
             // Start cooldown
             _nextAvailableTime = Time.time + Mathf.Max(0f, _spawnerData.spawnCooldown);
@@ -234,7 +251,7 @@ namespace MergeGame.Entities
             if (_active == this)
             {
                 _active = null;
-            }   
+            }
         }
     }
 }

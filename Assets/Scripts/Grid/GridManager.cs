@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using Zenject;
-using MergeGame.Entities;
-using MergeGame.Data;
 
 namespace MergeGame.Grid
 {
@@ -19,9 +16,6 @@ namespace MergeGame.Grid
         [SerializeField] private float _maxTileSize = 1.5f;
         [SerializeField] private float _minTileSize = 0.5f;
 
-        [Header("Item Prefab")]
-        [SerializeField] private Item _itemPrefab;
-
         public Dictionary<Vector2Int, Tile> Tiles => _tiles;
         public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
 
@@ -29,39 +23,21 @@ namespace MergeGame.Grid
         private GameObject _tilesParent;
 
         private ObjectPool<Tile> _tilePool; // pooling
-        private ObjectPool<Item> _itemPool; // pooling
         private const string TILES_PARENT_NAME = "Tiles";
-        private const string ITEMS_PARENT_NAME = "Items";
         private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
-        private GameObject _itemsParent;
 
         private float _tileSize;
         private Vector2 _startPos;
-        private DiContainer _container;
-
-        [Inject]
-        public void Construct(DiContainer container)
-        {
-            _container = container;
-        }
 
         private void Awake()
         {
             _tilesParent = new GameObject(TILES_PARENT_NAME);
-            _itemsParent = new GameObject(ITEMS_PARENT_NAME);
 
             _tilePool = new ObjectPool<Tile>(
                 createFunc: () => Instantiate(_tilePrefab, _tilesParent.transform),
                 actionOnGet: tile => tile.gameObject.SetActive(true),
                 actionOnRelease: tile => tile.gameObject.SetActive(false),
                 actionOnDestroy: tile => Destroy(tile.gameObject)
-            );
-
-            _itemPool = new ObjectPool<Item>(
-                createFunc: () => _container.InstantiatePrefabForComponent<Item>(_itemPrefab, _itemsParent.transform),
-                actionOnGet: item => item.gameObject.SetActive(true),
-                actionOnRelease: item => item.gameObject.SetActive(false),
-                actionOnDestroy: item => Destroy(item.gameObject)
             );
         }
 
@@ -84,11 +60,11 @@ namespace MergeGame.Grid
                 return false;
             }
 
-            if (_tiles == null) 
+            if (_tiles == null)
             {
                 _tiles = new Dictionary<Vector2Int, Tile>();
             }
-            else 
+            else
             {
                 _tiles.Clear();
             }
@@ -127,7 +103,7 @@ namespace MergeGame.Grid
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    Tile tile = GetOrCreateTile();
+                    Tile tile = _tilePool.Get();
                     tile.transform.localPosition = new Vector3(startPos.x + x * tileSize, startPos.y + y * tileSize, 0);
                     tile.transform.localScale = tileScale;
                     tile.Init((x % 2 != y % 2));
@@ -153,8 +129,6 @@ namespace MergeGame.Grid
             return true;
         }
 
-        private Tile GetOrCreateTile() => _tilePool.Get();
-
         public Tile GetTileAtPosition(Vector2Int pos)
         {
             _tiles.TryGetValue(pos, out Tile tile);
@@ -168,7 +142,7 @@ namespace MergeGame.Grid
         /// <returns>The tile at the given world position, or null if the position is outside the grid.</returns>
         public Tile GetTileAtWorldPosition(Vector3 worldPos)
         {
-            if (_tileSize <= 0f) 
+            if (_tileSize <= 0f)
             {
                 return null;
             }
@@ -181,51 +155,6 @@ namespace MergeGame.Grid
             y = Mathf.Clamp(y, 0, _height - 1);
 
             return GetTileAtPosition(new Vector2Int(x, y));
-        }
-
-        /// <summary>
-        /// Spawns an item at the given grid position.
-        /// </summary>
-        /// <param name="data">The item data.</param>
-        /// <param name="gridPos">The grid position.</param>
-        /// <returns>The spawned item, or null if the position is invalid or occupied.</returns>
-        public Item SpawnItem(MergeItemData data, Vector2Int gridPos)
-        {
-            if (_itemPrefab == null)
-            {
-                Debug.LogWarning("No Item Prefab assigned!");
-                return null;
-            }
-
-            Tile tile = GetTileAtPosition(gridPos);
-            if (tile == null)
-            {
-                Debug.LogWarning($"No tile at {gridPos}");
-                return null;
-            }
-
-            if (tile.HasItem())
-            {
-                Debug.LogWarning($"Tile at {gridPos} is already occupied");
-                return null;
-            }
-
-            Item newItem = GetItemFromPool();
-            newItem.Initialize(data, tile);
-            return newItem;
-        }
-
-        private Item GetItemFromPool() => _itemPool.Get();
-
-        /// <summary>
-        /// Returns an item to the pool.
-        /// </summary>
-        /// <param name="item">The item to return.</param>
-        public void ReturnItemToPool(Item item)
-        {
-            if (item == null) return;
-            item.transform.SetParent(_itemsParent.transform);
-            _itemPool.Release(item); // handles SetActive(false) automatically
         }
 
         /// <summary>
@@ -248,7 +177,7 @@ namespace MergeGame.Grid
                 _freeTilePositions.Add(gridPos);
             }
         }
-        
+
         /// <summary>
         /// Sets the active state of the grid game objects.
         /// </summary>
@@ -256,32 +185,25 @@ namespace MergeGame.Grid
         public void SetGameObjectsActive(bool active)
         {
             _tilesParent.SetActive(active);
-            _itemsParent.SetActive(active);
         }
 
         /// <summary>
-        /// Clears the grid by returning all items to the pool and destroying spawners.
+        /// Clears the grid by destroying spawners. Items are handled by ItemManager.
         /// </summary>
         public void ClearGrid()
         {
-            if (_tiles == null) 
+            if (_tiles == null)
             {
                 return;
             }
-            
+
             foreach (Tile tile in _tiles.Values)
             {
-                if (tile == null) 
+                if (tile == null)
                 {
                     continue;
                 }
-                
-                if (tile.HasItem())
-                {
-                    ReturnItemToPool(tile.GetItem());
-                    tile.ClearItem();
-                }
-                
+
                 if (tile.HasSpawner())
                 {
                     // Spawners are not pooled yet, there is only one. Destroy directly.
@@ -290,6 +212,5 @@ namespace MergeGame.Grid
                 }
             }
         }
-
     }
 }

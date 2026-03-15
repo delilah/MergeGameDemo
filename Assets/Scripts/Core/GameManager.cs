@@ -11,7 +11,7 @@ namespace MergeGame.Core
     public class GameManager : MonoBehaviour
     {    
         [SerializeField] private Spawner _spawnerPrefab; // generic prefab
-        [SerializeField] private SpawnerData _testSpawnerData;
+        [SerializeField] private SpawnerData _initialSpawnerData;
 
         public event Action OnGameStarted;
         public event Action OnPlayAgain;
@@ -20,15 +20,16 @@ namespace MergeGame.Core
         private GridManager _gridManager;
         private DiContainer _container;
         private GameConfig _gameConfig;
+        private ItemManager _itemManager;
 
         [Inject]
-        public void Construct(CollectionManager collectionManager, GridManager gridManager, DiContainer container, GameConfig gameConfig)
+        public void Construct(CollectionManager collectionManager, GridManager gridManager, DiContainer container, GameConfig gameConfig, ItemManager itemManager)
         {
             _collectionManager = collectionManager;
             _gridManager = gridManager;
             _container = container;
             _gameConfig = gameConfig;
-
+            _itemManager = itemManager;
         }
 
         private void Awake()
@@ -54,7 +55,7 @@ namespace MergeGame.Core
         /// <summary>
         /// Places the test spawner at the configured position.
         /// </summary>
-        private void PlaceTestSpawner()
+        private void PlaceInitialSpawner()
         {
             Vector2Int pos = _gameConfig.spawnerPlacementStart;
             Tile tile = _gridManager.GetTileAtPosition(pos);
@@ -74,7 +75,7 @@ namespace MergeGame.Core
             }
 
             Spawner spawner = _container.InstantiatePrefabForComponent<Spawner>(_spawnerPrefab);
-            spawner.Initialize(_testSpawnerData, true);
+            spawner.Initialize(_initialSpawnerData, true);
 
             tile.PlaceSpawner(spawner);
         }
@@ -95,12 +96,25 @@ namespace MergeGame.Core
         /// <returns>True if the game was loaded successfully, false otherwise.</returns>
         public bool LoadGame()
         {
+            if (_spawnerPrefab == null)
+            {
+                Debug.LogError("GameManager: _spawnerPrefab is not assigned. Aborting game start.");
+                return false;
+            }
+
+            if (_initialSpawnerData == null)
+            {
+                Debug.LogError("GameManager: _initialSpawnerData is not assigned. Aborting game start.");
+                return false;
+            }
+
             if (!_gridManager.GenerateGrid())
             {
                 Debug.LogError("Failed to generate grid. Aborting game start.");
                 return false;
             }
-            PlaceTestSpawner();
+
+            PlaceInitialSpawner();
             return true;
         }
 
@@ -110,7 +124,8 @@ namespace MergeGame.Core
         public void PlayAgain()
         {
             _collectionManager.Reset();
-            _gridManager.ClearGrid();
+            _itemManager.ClearAll();  // return all items to pool first
+            _gridManager.ClearGrid(); // then clear the grid
             OnPlayAgain?.Invoke();
         }
 
