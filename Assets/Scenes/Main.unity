@@ -1703,6 +1703,7 @@ MonoBehaviour:
   _gridManagerPrefab: {fileID: 1568625083121356677, guid: 778b00805a1081547832ddd733fce878, type: 3}
   _collectionManagerPrefab: {fileID: 7063802105543516219, guid: 5909fac1ed506e640b796907834dffe3, type: 3}
   _itemManagerPrefab: {fileID: 6610887839601919225, guid: 2340746cd75f4e144a6fb0159456de85, type: 3}
+  _spawnerManagerPrefab: {fileID: 0}
 --- !u!114 &1486158867
 MonoBehaviour:
   m_ObjectHideFlags: 0

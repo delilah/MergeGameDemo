@@ -9,27 +9,24 @@ using MergeGame.Data;
 namespace MergeGame.Core
 {
     public class GameManager : MonoBehaviour
-    {    
-        [SerializeField] private Spawner _spawnerPrefab; // generic prefab
-        [SerializeField] private SpawnerData _initialSpawnerData;
-
+    {
         public event Action OnGameStarted;
         public event Action OnPlayAgain;
 
         private CollectionManager _collectionManager;
         private GridManager _gridManager;
-        private DiContainer _container;
         private GameConfig _gameConfig;
         private ItemManager _itemManager;
+        private SpawnerManager _spawnerManager;
 
         [Inject]
-        public void Construct(CollectionManager collectionManager, GridManager gridManager, DiContainer container, GameConfig gameConfig, ItemManager itemManager)
+        public void Construct(CollectionManager collectionManager, GridManager gridManager, GameConfig gameConfig, ItemManager itemManager, SpawnerManager spawnerManager)
         {
             _collectionManager = collectionManager;
             _gridManager = gridManager;
-            _container = container;
             _gameConfig = gameConfig;
             _itemManager = itemManager;
+            _spawnerManager = spawnerManager;
         }
 
         private void Awake()
@@ -46,42 +43,14 @@ namespace MergeGame.Core
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-    #if !UNITY_WEBGL
+#if !UNITY_WEBGL
                 Application.Quit();
-    #endif
+#endif
             }
         }
 
         /// <summary>
-        /// Places the test spawner at the configured position.
-        /// </summary>
-        private void PlaceInitialSpawner()
-        {
-            Vector2Int pos = _gameConfig.spawnerPlacementStart;
-            Tile tile = _gridManager.GetTileAtPosition(pos);
-
-            if (tile == null)
-            {
-                Debug.LogWarning("Tile does not exist!");
-                return;
-            }
-
-            Debug.Log($"Tile found. HasItem={tile.HasItem()}, HasSpawner={tile.HasSpawner()}, IsEmpty={tile.IsEmpty}");
-
-            if (!tile.IsEmpty)
-            {
-                Debug.LogWarning("Tile is occupied!");
-                return;
-            }
-
-            Spawner spawner = _container.InstantiatePrefabForComponent<Spawner>(_spawnerPrefab);
-            spawner.Initialize(_initialSpawnerData, true);
-
-            tile.PlaceSpawner(spawner);
-        }
-
-        /// <summary>
-        /// Starts the game by loading the grid and placing the test spawner.
+        /// Starts the game by loading the grid and placing the initial spawner.
         /// </summary>
         public void StartGame()
         {
@@ -91,35 +60,23 @@ namespace MergeGame.Core
         }
 
         /// <summary>
-        /// Loads the game by generating the grid and placing the test spawner.
+        /// Loads the game by generating the grid and placing the initial spawner.
         /// </summary>
         /// <returns>True if the game was loaded successfully, false otherwise.</returns>
         public bool LoadGame()
         {
-            if (_spawnerPrefab == null)
-            {
-                Debug.LogError("GameManager: _spawnerPrefab is not assigned. Aborting game start.");
-                return false;
-            }
-
-            if (_initialSpawnerData == null)
-            {
-                Debug.LogError("GameManager: _initialSpawnerData is not assigned. Aborting game start.");
-                return false;
-            }
-
             if (!_gridManager.GenerateGrid())
             {
                 Debug.LogError("Failed to generate grid. Aborting game start.");
                 return false;
             }
 
-            PlaceInitialSpawner();
+            _spawnerManager.PlaceInitialSpawner();
             return true;
         }
 
         /// <summary>
-        /// Resets the game by clearing the grid and resetting all counts.
+        /// Resets the game by clearing items and the grid, then reloads.
         /// </summary>
         public void PlayAgain()
         {

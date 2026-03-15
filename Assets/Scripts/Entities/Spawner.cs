@@ -26,19 +26,22 @@ namespace MergeGame.Entities
         private Vector3 _baseScale;
 
         private AudioManager _audioManager;
-        private GridManager _gridManager;   // needed for FreeTilePositions
-        private ItemManager _itemManager;   // handles spawning
+        private GridManager _gridManager;       // needed for FreeTilePositions
+        private ItemManager _itemManager;       // handles spawning
+        private SpawnerManager _spawnerManager; // handles selection state
 
         [Inject]
-        public void Construct(AudioManager audioManager, GridManager gridManager, ItemManager itemManager)
+        public void Construct(AudioManager audioManager, GridManager gridManager, ItemManager itemManager, SpawnerManager spawnerManager)
         {
             _audioManager = audioManager;
             _gridManager = gridManager;
             _itemManager = itemManager;
+            _spawnerManager = spawnerManager;
         }
 
-        private static Spawner _active;
-
+        /// <summary>
+        /// Initializes the spawner with the given data. Must be called after instantiation.
+        /// </summary>
         public void Initialize(SpawnerData data, bool playIntroAnimation = false)
         {
             _spawnerData = data;
@@ -94,6 +97,10 @@ namespace MergeGame.Entities
             EnsureColliderSized();
         }
 
+        /// <summary>
+        /// Called by Tile after the spawner is placed on the grid.
+        /// Sets the base scale used for animations.
+        /// </summary>
         public void OnPlaced()
         {
             _baseScale = transform.localScale;
@@ -144,13 +151,9 @@ namespace MergeGame.Entities
 
             _audioManager.PlaySpawnerClick();
 
-            if (_active != this)
+            if (!_spawnerManager.IsActive(this))
             {
-                if (_active != null)
-                {
-                    _active.SetSelected(false);
-                }
-                _active = this;
+                _spawnerManager.SetActiveSpawner(this);
                 SetSelected(true);
                 return;
             }
@@ -159,7 +162,7 @@ namespace MergeGame.Entities
             TrySpawn();
         }
 
-        private void SetSelected(bool on)
+        public void SetSelected(bool on)
         {
             if (_tile != null)
             {
@@ -189,6 +192,12 @@ namespace MergeGame.Entities
             if (_spawnableCandidates.Count == 0)
             {
                 Debug.LogWarning("Spawner has no valid spawnable items.");
+                return;
+            }
+
+            if (_gridManager == null)
+            {
+                Debug.LogWarning("GridManager not ready; cannot spawn.");
                 return;
             }
 
@@ -235,23 +244,17 @@ namespace MergeGame.Entities
         private void OnDisable()
         {
             transform.DOKill();
-            if (_active == this)
-            {
-                SetSelected(false);
-                _active = null;
-            }
+            _spawnerManager.ClearActiveSpawner(this);
+            SetSelected(false);
         }
 
-        // NOTE: added OnDestroy to clear _active if this spawner is destroyed.
+        // NOTE: added OnDestroy to clear active spawner if this spawner is destroyed.
         // OnDisable is not reliably called on destroyed objects during scene reloads,
-        // so without this _active could hold a stale reference to a destroyed spawner.
+        // so without this _spawnerManager could hold a stale reference to a destroyed spawner.
         private void OnDestroy()
         {
             transform.DOKill();
-            if (_active == this)
-            {
-                _active = null;
-            }
+            _spawnerManager.ClearActiveSpawner(this);
         }
     }
 }
