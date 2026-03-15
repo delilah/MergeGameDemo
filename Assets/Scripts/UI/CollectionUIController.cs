@@ -74,8 +74,14 @@ namespace MergeGame.UI
 
         private void SpawnCollectParticles(Vector3 position)
         {
-            if (_collectParticlesPrefab == null) return;
-            Instantiate(_collectParticlesPrefab, position, Quaternion.identity);
+            if (_collectParticlesPrefab == null)
+            {
+                return;
+            }
+
+            ParticleSystem particles = Instantiate(_collectParticlesPrefab, position, Quaternion.identity);
+            var main = particles.main;
+            Destroy(particles.gameObject, main.duration + main.startLifetime.constantMax);
         }
 
         /// <summary>
