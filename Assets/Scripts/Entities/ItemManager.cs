@@ -11,7 +11,7 @@ namespace MergeGame.Entities
     {
         private const string ITEMS_PARENT_NAME = "Items";
 
-        [SerializeField] private Item _itemPrefab;  // assigned via installer or inspector
+        [SerializeField] private Item _itemPrefab;
 
         private GridManager _gridManager;
         private DiContainer _container;

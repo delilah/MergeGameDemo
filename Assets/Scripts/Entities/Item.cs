@@ -40,8 +40,18 @@ namespace MergeGame.Entities
             _itemManager = itemManager;   // handles pool return
         }
 
+        /// <summary>
+        /// Initializes the item with the given data and places it on the given tile.
+        /// Must be called after instantiation.
+        /// </summary>
         public void Initialize(MergeItemData data, Tile tile)
         {
+            if (tile == null)
+            {
+                Debug.LogError("Item: Cannot initialize with a null tile.");
+                return;
+            }
+
             _data = data;
 
             if (_spriteRenderer != null && _data.sprite != null)
@@ -67,6 +77,7 @@ namespace MergeGame.Entities
             tile.PlaceItem(this);
         }
 
+        // Called by ItemManager.ClearAll to detach the item from its tile before returning to pool
         public void ClearTile()
         {
             _currentTile = null;
@@ -122,11 +133,7 @@ namespace MergeGame.Entities
 
             if (isFinal)
             {
-                if (_collectionManager != null)
-                {
-                    _collectionManager.Collect(_data, transform.position);
-                }
-
+                _collectionManager.Collect(_data, transform.position);
                 Debug.Log($"{_data.itemName} collected!");
                 ReturnToPool();
             }
@@ -164,9 +171,7 @@ namespace MergeGame.Entities
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            Tile targetTile = _gridManager != null
-                ? _gridManager.GetTileAtWorldPosition(transform.position)
-                : null;
+            Tile targetTile = _gridManager.GetTileAtWorldPosition(transform.position);
 
             bool dropped = OnDrop(targetTile);
             if (!dropped)
@@ -222,6 +227,18 @@ namespace MergeGame.Entities
 
         private void MergeWith(Item targetItem)
         {
+            if (targetItem == null)
+            {
+                Debug.LogWarning("Item: Cannot merge with null target item.");
+                return;
+            }
+
+            if (targetItem.Data == null)
+            {
+                Debug.LogWarning("Item: Target item has no data; cannot merge.");
+                return;
+            }
+
             Tile targetTile = targetItem.CurrentTile;
 
             // Get current level before merging
