@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 using MergeGame.Grid;
-using MergeGame.Systems;
 using MergeGame.Interfaces;
 using MergeGame.Data;
 
@@ -24,20 +23,16 @@ namespace MergeGame.Entities
         private Vector3 _pointerOffset;
         private Camera _mainCamera;
 
-        private AudioManager _audioManager;
-        private CollectionManager _collectionManager;
-        private GridManager _gridManager;
-        private ItemManager _itemManager;
+        private GridManager _gridManager;   // needed for drag-and-drop (GetTileAtWorldPosition)
+        private ItemManager _itemManager;   // handles merge, collect, and pool return
 
         private const int DRAG_SORTING_ORDER_OFFSET = 20;
 
         [Inject]
-        public void Construct(AudioManager audioManager, CollectionManager collectionManager, GridManager gridManager, ItemManager itemManager)
+        public void Construct(GridManager gridManager, ItemManager itemManager)
         {
-            _audioManager = audioManager;
-            _collectionManager = collectionManager;
-            _gridManager = gridManager;   // needed for drag-and-drop (GetTileAtWorldPosition)
-            _itemManager = itemManager;   // handles pool return
+            _gridManager = gridManager;
+            _itemManager = itemManager;
         }
 
         /// <summary>
@@ -133,9 +128,7 @@ namespace MergeGame.Entities
 
             if (isFinal)
             {
-                _collectionManager.Collect(_data, transform.position);
-                Debug.Log($"{_data.itemName} collected!");
-                ReturnToPool();
+                _itemManager.CollectItem(this);
             }
             else
             {
@@ -213,7 +206,7 @@ namespace MergeGame.Entities
 
             if (targetItem.Data == this.Data)
             {
-                MergeWith(targetItem);
+                _itemManager.MergeItems(this, targetItem);
                 return true;
             }
 
@@ -225,41 +218,7 @@ namespace MergeGame.Entities
             transform.position = _startPosition;
         }
 
-        private void MergeWith(Item targetItem)
-        {
-            if (targetItem == null)
-            {
-                Debug.LogWarning("Item: Cannot merge with null target item.");
-                return;
-            }
-
-            if (targetItem.Data == null)
-            {
-                Debug.LogWarning("Item: Target item has no data; cannot merge.");
-                return;
-            }
-
-            Tile targetTile = targetItem.CurrentTile;
-
-            // Get current level before merging
-            int currentLevel = targetItem.Data.level;
-
-            // Play merge sound based on level
-            _audioManager.PlayMergeSoundForLevel(currentLevel);
-
-            ReturnToPool();
-
-            if (targetItem.Data.nextItem != null)
-            {
-                targetItem.Initialize(targetItem.Data.nextItem, targetTile);
-            }
-            else
-            {
-                targetItem.SetTile(targetTile);
-            }
-        }
-
-        private void ReturnToPool()
+        public void ReturnToPool()
         {
             _currentTile?.RemoveItem();
             ClearTile();

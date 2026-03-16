@@ -1,13 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;
 using MergeGame.Grid;
+using MergeGame.Systems;
 using MergeGame.Data;
-using System.Collections.Generic;
 
 namespace MergeGame.Entities
 {
-   public class ItemManager : MonoBehaviour
+    public class ItemManager : MonoBehaviour
     {
         private const string ITEMS_PARENT_NAME = "Items";
 
@@ -15,16 +16,20 @@ namespace MergeGame.Entities
 
         private GridManager _gridManager;
         private DiContainer _container;
+        private AudioManager _audioManager;
+        private CollectionManager _collectionManager;
 
         private ObjectPool<Item> _itemPool;
         private GameObject _itemsParent;
         private List<Item> _activeItems = new List<Item>();
 
         [Inject]
-        public void Construct(GridManager gridManager, DiContainer container)
+        public void Construct(GridManager gridManager, DiContainer container, AudioManager audioManager, CollectionManager collectionManager)
         {
             _gridManager = gridManager;
             _container = container;
+            _audioManager = audioManager;
+            _collectionManager = collectionManager;
         }
 
         private void Awake()
@@ -73,6 +78,69 @@ namespace MergeGame.Entities
         }
 
         /// <summary>
+        /// Merges the source item into the target item, producing the next item in the chain.
+        /// Plays the merge sound for the current level.
+        /// </summary>
+        /// <param name="source">The item being dragged.</param>
+        /// <param name="target">The item being merged into.</param>
+        public void MergeItems(Item source, Item target)
+        {
+            if (source == null)
+            {
+                Debug.LogWarning("ItemManager: Cannot merge — source item is null.");
+                return;
+            }
+
+            if (target == null)
+            {
+                Debug.LogWarning("ItemManager: Cannot merge — target item is null.");
+                return;
+            }
+
+            if (target.Data == null)
+            {
+                Debug.LogWarning("ItemManager: Cannot merge — target item has no data.");
+                return;
+            }
+
+            Tile targetTile = target.CurrentTile;
+
+            // Get current level before merging
+            int currentLevel = target.Data.level;
+
+            // Play merge sound based on level
+            _audioManager.PlayMergeSoundForLevel(currentLevel);
+
+            source.ReturnToPool();
+
+            if (target.Data.nextItem != null)
+            {
+                target.Initialize(target.Data.nextItem, targetTile);
+            }
+            else
+            {
+                target.SetTile(targetTile);
+            }
+        }
+
+        /// <summary>
+        /// Collects a final-tier item, triggering collection tracking and returning it to the pool.
+        /// </summary>
+        /// <param name="item">The item to collect.</param>
+        public void CollectItem(Item item)
+        {
+            if (item == null)
+            {
+                Debug.LogWarning("ItemManager: Cannot collect a null item.");
+                return;
+            }
+
+            _collectionManager.Collect(item.Data, item.transform.position);
+            Debug.Log($"{item.Data.itemName} collected!");
+            item.ReturnToPool();
+        }
+
+        /// <summary>
         /// Returns an item to the pool.
         /// </summary>
         /// <param name="item">The item to return.</param>
@@ -89,7 +157,7 @@ namespace MergeGame.Entities
         }
 
         /// <summary>
-        /// Returns all active items to the pool. 
+        /// Returns all active items to the pool.
         /// Call before ClearGrid on reset.
         /// </summary>
         public void ClearAll()
@@ -100,11 +168,13 @@ namespace MergeGame.Entities
                 {
                     continue;
                 }
+
                 item.CurrentTile?.RemoveItem();
                 item.ClearTile();
                 item.transform.SetParent(_itemsParent.transform);
                 _itemPool.Release(item);
             }
+
             _activeItems.Clear();
         }
     }
