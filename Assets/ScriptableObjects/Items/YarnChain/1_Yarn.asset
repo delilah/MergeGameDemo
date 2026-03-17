@@ -17,3 +17,4 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: fcd8f5073b08de149956948bd781d40a, type: 3}
   nextItem: {fileID: 11400000, guid: 1401af45f1a7a6341ba0691002c024ad, type: 2}
   isFinal: 0
+  mergeSound: {fileID: 8300000, guid: 94df8a0be7275114a9db1012008bf70e, type: 3}

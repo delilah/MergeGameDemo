@@ -42,17 +42,17 @@ namespace MergeGame.Systems
         /// <summary>
         /// Plays a spawner click sound.
         /// </summary>
-        public void PlaySpawnerClick() => PlaySfx(_config?.sfx.spawnerClick);
+        public void PlaySpawnerClick() => PlaySfx(_config?.sfx?.spawnerClick);
 
         /// <summary>
         /// Plays a collect sound.
         /// </summary>
-        public void PlayCollect() => PlaySfx(_config?.sfx.collect);
+        public void PlayCollect() => PlaySfx(_config?.sfx?.collect);
 
         /// <summary>
         /// Plays a merge sound.
         /// </summary>
-        public void PlayMerge() => PlaySfx(_config?.sfx.merge);
+        public void PlayMerge() => PlaySfx(_config?.sfx?.merge);
 
         /// <summary>
         /// Returns the generic merge sound clip for the given level.
@@ -70,9 +70,9 @@ namespace MergeGame.Systems
 
             return category switch
             {
-                MergeCategory.Items => _config?.sfx.mergeItems,
-                MergeCategory.Kittens => _config?.sfx.mergeKittens,
-                _ => _config?.sfx.merge
+                MergeCategory.Items => _config?.sfx?.mergeItems,
+                MergeCategory.Kittens => _config?.sfx?.mergeKittens,
+                _ => _config?.sfx?.merge
             };
         }
 
