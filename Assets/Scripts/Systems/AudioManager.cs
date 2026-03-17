@@ -24,7 +24,9 @@ namespace MergeGame.Systems
         private void Start()
         {
             if (_collectionManager != null)
+            {
                 _collectionManager.OnItemCollected += HandleItemCollected;
+            }
 
             PlayMusic();
         }
@@ -32,30 +34,32 @@ namespace MergeGame.Systems
         private void OnDestroy()
         {
             if (_collectionManager != null)
+            {
                 _collectionManager.OnItemCollected -= HandleItemCollected;
+            }
         }
 
-
         /// <summary>
-        /// Plays a spawner click sound
+        /// Plays a spawner click sound.
         /// </summary>
         public void PlaySpawnerClick() => PlaySfx(_config?.sfx.spawnerClick);
-        
+
         /// <summary>
-        /// Plays a collect sound
+        /// Plays a collect sound.
         /// </summary>
         public void PlayCollect() => PlaySfx(_config?.sfx.collect);
-        
+
         /// <summary>
-        /// Plays a merge sound
+        /// Plays a merge sound.
         /// </summary>
         public void PlayMerge() => PlaySfx(_config?.sfx.merge);
 
         /// <summary>
-        /// Plays a merge sound based on the level
+        /// Returns the generic merge sound clip for the given level.
+        /// Used as a fallback when an item has no specific mergeSound assigned.
         /// </summary>
-        /// <param name="level">The level of the merge</param>
-        public void PlayMergeSoundForLevel(int level)
+        /// <param name="level">The level of the merge.</param>
+        public AudioClip GetMergeSoundForLevel(int level)
         {
             var category = level switch
             {
@@ -63,26 +67,26 @@ namespace MergeGame.Systems
                 1 => MergeCategory.Kittens,
                 _ => MergeCategory.Generic
             };
-            PlayMergeSound(category);
-        }
 
-        private void PlayMergeSound(MergeCategory category)
-        {
-            switch (category)
+            return category switch
             {
-                case MergeCategory.Items:   PlaySfx(_config?.sfx.mergeItems);   break;
-                case MergeCategory.Kittens: PlaySfx(_config?.sfx.mergeKittens); break;
-                default:                    PlaySfx(_config?.sfx.merge);        break;
-            }
+                MergeCategory.Items => _config?.sfx.mergeItems,
+                MergeCategory.Kittens => _config?.sfx.mergeKittens,
+                _ => _config?.sfx.merge
+            };
         }
 
         /// <summary>
-        /// Plays a sound effect
+        /// Plays a sound effect.
         /// </summary>
-        /// <param name="clip">The sound effect to play</param>
+        /// <param name="clip">The sound effect to play.</param>
         public void PlaySfx(AudioClip clip)
         {
-            if (clip == null || _sfxSource == null) return;
+            if (clip == null || _sfxSource == null)
+            {
+                return;
+            }
+
             _sfxSource.PlayOneShot(clip, _config?.sfxVolume ?? 1f);
         }
 
@@ -93,7 +97,11 @@ namespace MergeGame.Systems
 
         private void PlayMusic()
         {
-            if (_config == null || _config.backgroundMusic == null || _musicSource == null) return;
+            if (_config == null || _config.backgroundMusic == null || _musicSource == null)
+            {
+                return;
+            }
+
             _musicSource.clip = _config.backgroundMusic;
             _musicSource.volume = _config.musicVolume;
             _musicSource.loop = true;
