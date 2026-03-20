@@ -77,17 +77,23 @@ namespace MergeGame.Systems
         }
 
         /// <summary>
-        /// Plays a sound effect.
+        /// Plays a sound effect at the given pitch. Defaults to 1 (no pitch change).
+        /// Note: uses Play() instead of PlayOneShot() so that pitch is respected.
+        /// This means overlapping sounds on the same source will interrupt each other.
         /// </summary>
         /// <param name="clip">The sound effect to play.</param>
-        public void PlaySfx(AudioClip clip)
+        /// <param name="pitch">The pitch to play the sound at.</param>
+        public void PlaySfx(AudioClip clip, float pitch = 1f)
         {
             if (clip == null || _sfxSource == null)
             {
                 return;
             }
 
-            _sfxSource.PlayOneShot(clip, _config?.sfxVolume ?? 1f);
+            _sfxSource.pitch = pitch;
+            _sfxSource.clip = clip;
+            _sfxSource.volume = _config?.sfxVolume ?? 1f;
+            _sfxSource.Play();
         }
 
         private void HandleItemCollected(MergeItemData itemData, int newCount, Vector3 position)

@@ -14,6 +14,7 @@ namespace MergeGame.Data
 
         [Header("Audio")]
         public AudioClip mergeSound;
+        [Range(-3f, 3f)] public float mergeSoundPitch = 1f;
 
 #if UNITY_EDITOR
         private void OnValidate()

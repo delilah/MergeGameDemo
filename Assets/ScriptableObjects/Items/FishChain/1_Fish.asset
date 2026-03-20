@@ -18,3 +18,4 @@ MonoBehaviour:
   nextItem: {fileID: 11400000, guid: 347816f402a413e4083fa06dc59d54f3, type: 2}
   isFinal: 0
   mergeSound: {fileID: 8300000, guid: 94df8a0be7275114a9db1012008bf70e, type: 3}
+  mergeSoundPitch: 1.22

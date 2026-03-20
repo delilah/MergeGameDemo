@@ -79,7 +79,8 @@ namespace MergeGame.Entities
 
         /// <summary>
         /// Merges the source item into the target item, producing the next item in the chain.
-        /// Uses the item's own mergeSound if assigned, otherwise falls back to the level-based sound.
+        /// Uses the item's own mergeSound and mergeSoundPitch if assigned,
+        /// otherwise falls back to the level-based sound at default pitch.
         /// </summary>
         /// <param name="source">The item being dragged.</param>
         /// <param name="target">The item being merged into.</param>
@@ -105,12 +106,17 @@ namespace MergeGame.Entities
 
             Tile targetTile = target.CurrentTile;
 
-            // Use item-specific merge sound if assigned, otherwise fall back to level-based sound
+            // Use item-specific merge sound and pitch if assigned,
+            // otherwise fall back to level-based sound at default pitch
             AudioClip mergeClip = source.Data.mergeSound != null
                 ? source.Data.mergeSound
                 : _audioManager.GetMergeSoundForLevel(source.Data.level);
 
-            _audioManager.PlaySfx(mergeClip);
+            float pitch = source.Data.mergeSound != null
+                ? source.Data.mergeSoundPitch
+                : 1f;
+
+            _audioManager.PlaySfx(mergeClip, pitch);
 
             source.ReturnToPool();
 
