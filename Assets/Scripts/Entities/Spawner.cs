@@ -29,14 +29,16 @@ namespace MergeGame.Entities
         private GridManager _gridManager;       // needed for FreeTilePositions
         private ItemManager _itemManager;       // handles spawning
         private SpawnerManager _spawnerManager; // handles selection state
+        private EnergyManager _energyManager;
 
         [Inject]
-        public void Construct(AudioManager audioManager, GridManager gridManager, ItemManager itemManager, SpawnerManager spawnerManager)
+        public void Construct(AudioManager audioManager, GridManager gridManager, ItemManager itemManager, SpawnerManager spawnerManager, EnergyManager energyManager)
         {
             _audioManager = audioManager;
             _gridManager = gridManager;
             _itemManager = itemManager;
             _spawnerManager = spawnerManager;
+            _energyManager = energyManager;
         }
 
         /// <summary>
@@ -205,6 +207,12 @@ namespace MergeGame.Entities
             if (freeTiles.Count == 0)
             {
                 Debug.Log("No available tiles");
+                return;
+            }
+
+            if (!_energyManager.TrySpendEnergy(EnergyManager.EnergyCost.Base))
+            {
+                Debug.Log("Not enough energy");
                 return;
             }
 

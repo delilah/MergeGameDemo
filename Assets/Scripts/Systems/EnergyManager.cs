@@ -7,6 +7,74 @@ namespace MergeGame.Systems
 {
     public class EnergyManager : MonoBehaviour
     {
-       // TODO: Implement energy system
+
+        public enum EnergyCost
+        {
+            Base = 1,
+            Medium = 2,
+            High = 3
+        }
+
+        private GameConfig _config;
+
+        private int _maxEnergy;
+        private int _currentEnergy;
+        private float _regenTimer = 0f;
+
+        [Inject]
+        public void Construct(GameConfig gameConfig)
+        {
+            _config = gameConfig;
+        }
+
+        private void Awake()
+        {
+            _maxEnergy = _config.maxEnergy;
+            _currentEnergy = _maxEnergy;
+        }
+
+        private void Update()
+        {
+            if (_currentEnergy < _maxEnergy)
+            {
+                RegenerateEnergy();
+            }
+        }
+
+        /// <summary>
+        /// Regenerates 1 energy unit every regenEnergyTime seconds.
+        /// </summary>
+        private void RegenerateEnergy()
+        {
+            _regenTimer += Time.deltaTime;
+
+            if (_regenTimer >= _config.regenEnergyTime)
+            {
+                _currentEnergy++;
+                Debug.Log(_currentEnergy);
+                _regenTimer = 0f;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to spend energy based on the specified cost.
+        /// Resets the regen timer on success so the next unit takes a full cycle.
+        /// </summary>
+        /// <param name="cost">The energy cost to spend.</param>
+        /// <returns>True if energy was spent, false if there was not enough energy.</returns>
+        public bool TrySpendEnergy(EnergyCost cost = EnergyCost.Base)
+        {
+            int amount = (int)cost;
+
+            if (_currentEnergy <= 0 || _currentEnergy < amount)
+            {
+                return false;
+            }
+
+            _currentEnergy -= amount;
+            _regenTimer = 0f;
+            Debug.Log(_currentEnergy);
+            return true;
+        }
     }
 }

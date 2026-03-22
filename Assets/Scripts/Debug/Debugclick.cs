@@ -7,7 +7,9 @@ namespace MergeGame.MergeDebug
     {
         public void OnPointerClick(PointerEventData eventData)
         {
+#if UNITY_EDITOR
             Debug.Log("Clicked on " + gameObject.name);
+#endif
         }
     }
 }

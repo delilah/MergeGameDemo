@@ -7,6 +7,8 @@ namespace MergeGame.Data
     {
         [Header("Gameplay")]
         public int itemsToWin = 7;
+        public int maxEnergy = 100;
+        public float regenEnergyTime = 60f; // in seconds
 
         [Header("SFX")]
         public SfxConfig sfx;
@@ -31,6 +33,16 @@ namespace MergeGame.Data
                 Debug.LogWarning("GameConfig: itemsToWin should be greater than zero.");
             }
 
+            if (maxEnergy <= 0)
+            {
+                Debug.LogWarning("GameConfig: maxEnergy should be greater than zero.");
+            }
+
+            if (regenEnergyTime <= 0f)
+            {
+                Debug.LogWarning("GameConfig: regenEnergyTime should be greater than zero.");
+            }
+
             if (sfx == null)
             {
                 Debug.LogWarning("GameConfig: sfx is not initialized.");
@@ -50,6 +62,8 @@ namespace MergeGame.Data
             {
                 Debug.LogWarning("GameConfig: sfxVolume should be between 0 and 1.");
             }
+
+            
         }
 #endif
     }
