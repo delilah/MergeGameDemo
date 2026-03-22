@@ -1704,6 +1704,7 @@ MonoBehaviour:
   _collectionManagerPrefab: {fileID: 7063802105543516219, guid: 5909fac1ed506e640b796907834dffe3, type: 3}
   _itemManagerPrefab: {fileID: 6610887839601919225, guid: 2340746cd75f4e144a6fb0159456de85, type: 3}
   _spawnerManagerPrefab: {fileID: 7519276013915182003, guid: bdc94acaa9a6e314ead9a8a4b683f419, type: 3}
+  _energyManagerPrefab: {fileID: 6146515308771325575, guid: 7652bc04a01278c4cb17d664d6989691, type: 3}
 --- !u!114 &1486158867
 MonoBehaviour:
   m_ObjectHideFlags: 0

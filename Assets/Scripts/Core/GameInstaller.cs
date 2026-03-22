@@ -16,6 +16,7 @@ namespace MergeGame.Core
         [SerializeField] private CollectionManager _collectionManagerPrefab;
         [SerializeField] private ItemManager _itemManagerPrefab;
         [SerializeField] private SpawnerManager _spawnerManagerPrefab;
+        [SerializeField] private EnergyManager _energyManagerPrefab;
 
         public override void InstallBindings()
         {
@@ -26,6 +27,7 @@ namespace MergeGame.Core
             if (_collectionManagerPrefab == null) throw new System.Exception("GameInstaller: _collectionManagerPrefab is not assigned.");
             if (_itemManagerPrefab == null) throw new System.Exception("GameInstaller: _itemManagerPrefab is not assigned.");
             if (_spawnerManagerPrefab == null) throw new System.Exception("GameInstaller: _spawnerManagerPrefab is not assigned.");
+            if (_energyManagerPrefab == null) throw new System.Exception("GameInstaller: _energyManagerPrefab is not assigned.");
 
 
             // Bind GameConfig as a singleton
@@ -38,6 +40,7 @@ namespace MergeGame.Core
             Container.Bind<GridManager>().FromComponentInNewPrefab(_gridManagerPrefab).AsSingle();
             Container.Bind<ItemManager>().FromComponentInNewPrefab(_itemManagerPrefab).AsSingle();
             Container.Bind<SpawnerManager>().FromComponentInNewPrefab(_spawnerManagerPrefab).AsSingle();
+            Container.Bind<EnergyManager>().FromComponentInNewPrefab(_energyManagerPrefab).AsSingle();
         }
     }
 }
