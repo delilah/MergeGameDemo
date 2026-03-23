@@ -25,6 +25,10 @@ namespace MergeGame.Entities
         private Tween _touchTween;
         private Vector3 _baseScale;
 
+        private int _spawnCount = 0;
+        private bool _isRecharging = false;
+        private float _rechargeTimer = 0f;
+
         private AudioManager _audioManager;
         private GridManager _gridManager;       // needed for FreeTilePositions
         private ItemManager _itemManager;       // handles spawning
@@ -99,6 +103,21 @@ namespace MergeGame.Entities
             EnsureColliderSized();
         }
 
+        private void Update()
+        {
+            if (_isRecharging)
+            {
+                _rechargeTimer += Time.deltaTime;
+
+                if (_rechargeTimer >= _spawnerData.rechargeDuration)
+                {
+                    _isRecharging = false;
+                    _rechargeTimer = 0f;
+                    _spawnCount = 0;
+                }
+            }
+        }
+
         /// <summary>
         /// Called by Tile after the spawner is placed on the grid.
         /// Sets the base scale used for animations.
@@ -132,6 +151,11 @@ namespace MergeGame.Entities
 
         public void OnSpawnerTouchAnimation()
         {
+            if (_isRecharging)
+            {
+                return;
+            }
+            
             if (_touchTween != null && _touchTween.IsActive())
             {
                 _touchTween.Kill();
@@ -148,6 +172,11 @@ namespace MergeGame.Entities
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (_isRecharging)
+            {
+                return;
+            }
+            
             StopIntroSpawnerAnimation();
             OnSpawnerTouchAnimation();
 
@@ -177,6 +206,12 @@ namespace MergeGame.Entities
             if (_spawnerData == null)
             {
                 Debug.LogWarning("SpawnerData is null; cannot spawn.");
+                return;
+            }
+
+            if (_isRecharging)
+            {
+                Debug.Log("Spawner is recharging.");
                 return;
             }
 
@@ -224,8 +259,18 @@ namespace MergeGame.Entities
 
             _itemManager.SpawnItem(itemData, gridPos);
 
+            _spawnCount++;
+
             // Start cooldown
-            _nextAvailableTime = Time.time + Mathf.Max(0f, _spawnerData.spawnCooldown);
+            _nextAvailableTime = Time.time + Mathf.Max(0f, _spawnerData.spawnInterval);
+
+            // Start recharging if max spawn count reached
+            if (_spawnCount >= _spawnerData.maxSpawnCount)
+            {
+                _isRecharging = true;
+                _rechargeTimer = 0f;
+                Debug.Log("Spawner exhausted, recharging.");
+            }
         }
 
         public void SetTile(Tile tile)

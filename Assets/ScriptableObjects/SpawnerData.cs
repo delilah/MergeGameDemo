@@ -8,6 +8,13 @@ namespace MergeGame.Data
         public string spawnerName;
         public Sprite sprite;
         public MergeItemData[] spawnableItems;
-        public float spawnCooldown = 1f;
+
+        [Header("Spawn Rate")]
+        public float spawnInterval = 0.2f;
+
+        [Header("Exhaustion")]
+        public int maxSpawnCount = 20;
+        public float rechargeDuration = 10f;
     }
 }
+
