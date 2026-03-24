@@ -114,6 +114,7 @@ namespace MergeGame.Entities
                     _isRecharging = false;
                     _rechargeTimer = 0f;
                     _spawnCount = 0;
+                    IntroSpawnerAnimation();
                 }
             }
         }
