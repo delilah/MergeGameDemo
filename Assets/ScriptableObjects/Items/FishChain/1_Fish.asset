@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 1_Fish
   m_EditorClassIdentifier: 
+  _id: b0081b675b160f74c93d467a15871597
   itemName: Fish
   level: 0
   sprite: {fileID: 21300000, guid: 905419c5489ce204694fbba9608193bd, type: 3}

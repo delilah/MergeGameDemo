@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 1_Yarn
   m_EditorClassIdentifier: 
+  _id: efb39e602478e284a9a5add53b535606
   itemName: Yarn Ball
   level: 0
   sprite: {fileID: 21300000, guid: fcd8f5073b08de149956948bd781d40a, type: 3}

@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 2_Kitten
   m_EditorClassIdentifier: 
-  itemName: Pappyny Kitten
+  _id: 3e07ac899c791be49a0b247037a959a3
+  itemName: Pappyny
   level: 1
   sprite: {fileID: 21300000, guid: 0d1e80e64ab6fbf44b9e969bad7fa29b, type: 3}
   nextItem: {fileID: 11400000, guid: eb4b96660bb0c7244810b633e6643926, type: 2}
   isFinal: 0
+  mergeSound: {fileID: 0}
+  mergeSoundPitch: 1

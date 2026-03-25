@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 2_Kitten
   m_EditorClassIdentifier: 
-  itemName: Kitten
+  _id: 7834ce6ca7029cf4689717b2845f5271
+  itemName: Tortie
   level: 1
   sprite: {fileID: 21300000, guid: b8c744ccc68fe37448e21e53fd640a01, type: 3}
   nextItem: {fileID: 11400000, guid: 4186a2b9ce7618a498973c59272aa8ef, type: 2}
   isFinal: 0
   mergeSound: {fileID: 0}
+  mergeSoundPitch: 1

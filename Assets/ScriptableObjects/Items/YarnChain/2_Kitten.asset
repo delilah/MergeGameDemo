@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 2_Kitten
   m_EditorClassIdentifier: 
-  itemName: Kitten
+  _id: de7285f7b01152344a4e905d7d39a5ef
+  itemName: Eerie
   level: 1
   sprite: {fileID: 21300000, guid: 3dd6cd8673217dc438a90ce5f8e451e8, type: 3}
   nextItem: {fileID: 11400000, guid: 77d696e62950d0f448708a44ec7f1343, type: 2}
   isFinal: 0
+  mergeSound: {fileID: 0}
+  mergeSoundPitch: 1

@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 1_MilkBottle
   m_EditorClassIdentifier: 
+  _id: 9acc9618ab0aef346b643ba91f3066ff
   itemName: Milk Bottle
   level: 0
   sprite: {fileID: 21300000, guid: b1409deba8a16dc4699237b9f9e802e7, type: 3}
   nextItem: {fileID: 11400000, guid: aac17e7de3927534890f67f19b9447d6, type: 2}
   isFinal: 0
   mergeSound: {fileID: 8300000, guid: 94df8a0be7275114a9db1012008bf70e, type: 3}
+  mergeSoundPitch: 1

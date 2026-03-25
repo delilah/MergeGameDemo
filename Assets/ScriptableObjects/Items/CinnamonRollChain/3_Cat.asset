@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9728ee89fe044a4eac840fd2ade861e, type: 3}
   m_Name: 3_Cat
   m_EditorClassIdentifier: 
-  itemName: Cinnamon Cat
+  _id: 677c6acd299e7084b92acea316c5dcf8
+  itemName: Tortie
   level: 2
   sprite: {fileID: 21300000, guid: fc6f871cf40fa96408d9d88a76a9e1e1, type: 3}
   nextItem: {fileID: 0}
   isFinal: 1
+  mergeSound: {fileID: 0}
+  mergeSoundPitch: 1
