@@ -25,6 +25,16 @@ namespace MergeGame.Data
         [Header("Spawner")]
         public Vector2Int spawnerPlacementStart = new Vector2Int(3, 3);
 
+        [Header("Values")]
+        public string itemsParentName = "Items";
+        public string tilesParentName = "Tiles";
+        public int dragSortingOrderOffset = 20;
+        public int targetFrameRate = 60;
+        
+
+        [Header("Cat Collection")]
+        public CatCollectionConfig catCollectionConfig;
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -61,6 +71,11 @@ namespace MergeGame.Data
             if (sfxVolume < 0f || sfxVolume > 1f)
             {
                 Debug.LogWarning("GameConfig: sfxVolume should be between 0 and 1.");
+            }
+            
+            if (catCollectionConfig == null)
+            {
+                Debug.LogWarning("GameConfig: catCollectionConfig is not assigned.");
             }
 
             

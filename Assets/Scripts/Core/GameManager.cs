@@ -31,7 +31,7 @@ namespace MergeGame.Core
 
         private void Awake()
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = _gameConfig.targetFrameRate;
         }
 
         private void Start()

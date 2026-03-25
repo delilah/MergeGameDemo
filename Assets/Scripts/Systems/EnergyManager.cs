@@ -7,6 +7,7 @@ namespace MergeGame.Systems
 {
     public class EnergyManager : MonoBehaviour
     {
+        public event Action OnEnergyRegenerated;
 
         public enum EnergyCost
         {
@@ -41,6 +42,11 @@ namespace MergeGame.Systems
             }
         }
 
+        public int GetCurrentEnergy()
+        {
+            return _currentEnergy;
+        }
+
         /// <summary>
         /// Regenerates 1 energy unit every regenEnergyTime seconds.
         /// </summary>
@@ -51,7 +57,7 @@ namespace MergeGame.Systems
             if (_regenTimer >= _config.regenEnergyTime)
             {
                 _currentEnergy++;
-                Debug.Log(_currentEnergy);
+                OnEnergyRegenerated?.Invoke();
                 _regenTimer = 0f;
             }
         }
@@ -72,8 +78,8 @@ namespace MergeGame.Systems
             }
 
             _currentEnergy -= amount;
+            OnEnergyRegenerated?.Invoke();
             _regenTimer = 0f;
-            Debug.Log(_currentEnergy);
             return true;
         }
     }

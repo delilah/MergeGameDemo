@@ -21,6 +21,11 @@ namespace MergeGame.UI
         [SerializeField] private Button _startButton;
         [SerializeField] private Button _playAgainButton;
 
+        [SerializeField] private TMP_Text[] _catNameTexts;
+        [SerializeField] private Image[] _catIcons;
+
+        private CatCollectionConfig _catsConfig;
+
         private CollectionManager _collectionManager;
         private GameConfig _gameConfig;
         private GameManager _gameManager;
@@ -29,13 +34,14 @@ namespace MergeGame.UI
         private StringBuilder _textBuilder = new StringBuilder();
 
         [Inject]
-        public void Construct(CollectionManager collectionManager, GameConfig gameConfig, GameManager gameManager)
+        public void Construct(CollectionManager collectionManager, GameConfig gameConfig, GameManager gameManager, CatCollectionConfig catsConfig)
         {
             _collectionManager = collectionManager;
             _gameConfig = gameConfig;
             _gameManager = gameManager;
+            _catsConfig = catsConfig;
         }
-        
+
         /// <summary>
         /// Show the intro panel
         /// </summary>
@@ -83,6 +89,7 @@ namespace MergeGame.UI
             _playAgainButton.onClick.AddListener(_gameManager.PlayAgain);
 
             PopulateIntroText();
+            UpdateCatBadges();
             
             ShowIntro();
         }
@@ -112,6 +119,32 @@ namespace MergeGame.UI
             _textBuilder.Append($"Merge and collect {_gameConfig.itemsToWin} to win\n(demo)");
 
             _introPanelText.text = _textBuilder.ToString();
+        }
+
+        private void UpdateCatBadges()
+        {
+            if (_catsConfig?.trackedItems == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _catsConfig.trackedItems.Length; i++)
+            {
+                if (_catsConfig.trackedItems[i] == null)
+                {
+                    continue;
+                }
+
+                if (i < _catNameTexts.Length && _catNameTexts[i] != null)
+                {
+                    _catNameTexts[i].text = _catsConfig.trackedItems[i].itemName;
+                }
+
+                if (i < _catIcons.Length && _catIcons[i] != null)
+                {
+                     _catIcons[i].sprite = _catsConfig.trackedItems[i].sprite;
+                }
+            }
         }
     }
 }

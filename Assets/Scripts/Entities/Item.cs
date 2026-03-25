@@ -25,14 +25,14 @@ namespace MergeGame.Entities
 
         private GridManager _gridManager;   // needed for drag-and-drop (GetTileAtWorldPosition)
         private ItemManager _itemManager;   // handles merge, collect, and pool return
-
-        private const int DRAG_SORTING_ORDER_OFFSET = 20;
+        private GameConfig _gameConfig;
 
         [Inject]
-        public void Construct(GridManager gridManager, ItemManager itemManager)
+        public void Construct(GridManager gridManager, ItemManager itemManager, GameConfig gameConfig)
         {
             _gridManager = gridManager;
             _itemManager = itemManager;
+            _gameConfig = gameConfig;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace MergeGame.Entities
             if (_spriteRenderer != null)
             {
                 _originalSortingOrder = _spriteRenderer.sortingOrder;
-                _spriteRenderer.sortingOrder = _originalSortingOrder + DRAG_SORTING_ORDER_OFFSET;
+                _spriteRenderer.sortingOrder = _originalSortingOrder + _gameConfig.dragSortingOrderOffset;
             }
         }
 

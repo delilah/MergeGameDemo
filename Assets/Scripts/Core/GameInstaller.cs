@@ -10,6 +10,7 @@ namespace MergeGame.Core
     public class GameInstaller : MonoInstaller
     {
         [SerializeField] private GameConfig _gameConfig;
+        [SerializeField] private CatCollectionConfig _catCollectionConfig;
         [SerializeField] private AudioManager _audioManagerPrefab;
         [SerializeField] private GameManager _gameManagerPrefab;
         [SerializeField] private GridManager _gridManagerPrefab;
@@ -18,9 +19,12 @@ namespace MergeGame.Core
         [SerializeField] private SpawnerManager _spawnerManagerPrefab;
         [SerializeField] private EnergyManager _energyManagerPrefab;
 
+       
+
         public override void InstallBindings()
         {
             if (_gameConfig == null) throw new System.Exception("GameInstaller: _gameConfig is not assigned.");
+            if (_catCollectionConfig == null) throw new System.Exception("GameInstaller: _catCollectionConfig is not assigned");
             if (_audioManagerPrefab == null) throw new System.Exception("GameInstaller: _audioManagerPrefab is not assigned.");
             if (_gameManagerPrefab == null) throw new System.Exception("GameInstaller: _gameManagerPrefab is not assigned.");
             if (_gridManagerPrefab == null) throw new System.Exception("GameInstaller: _gridManagerPrefab is not assigned.");
@@ -32,6 +36,7 @@ namespace MergeGame.Core
 
             // Bind GameConfig as a singleton
             Container.BindInstance(_gameConfig).AsSingle();
+            Container.BindInstance(_catCollectionConfig).AsSingle();
 
             // Bind managers as singletons
             Container.Bind<AudioManager>().FromComponentInNewPrefab(_audioManagerPrefab).AsSingle();

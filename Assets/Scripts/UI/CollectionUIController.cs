@@ -5,14 +5,13 @@ using TMPro;
 using Zenject;
 using MergeGame.Systems;
 using MergeGame.Data;
- 
+
 namespace MergeGame.UI
 {
     /// <summary>
     /// UI controller that listens to CollectionManager events and displays collection counts.
     /// Uses StringBuilder for efficient text building on mobile.
     /// </summary>
-     
     public class CollectionUIController : MonoBehaviour
     {
         [Header("UI References")]
@@ -20,33 +19,55 @@ namespace MergeGame.UI
         // triggering full Canvas rebuilds on static elements when collection updates.
         // Updated via StringBuilder to avoid per-frame string allocations on mobile.
         [SerializeField] private TMP_Text _collectionText;
+        [SerializeField] private TMP_Text _scoreText;
+
+        [Header("Cats")]
+        [SerializeField] private TMP_Text[] _catScoreTexts;
 
         [Header("Effects")]
         [SerializeField] private ParticleSystem _collectParticlesPrefab;
 
         [Header("Display Settings")]
-        [SerializeField] private MergeItemData[] _trackedItems; // Items to display in UI
         [SerializeField] private bool _showOnlyCollected = false; // Only show items with count > 0
 
         // Reusable StringBuilder to avoid allocations
         private StringBuilder _textBuilder = new StringBuilder();
 
+        private CatCollectionConfig _catsConfig;
         private CollectionManager _collectionManager;
+        private GameConfig _gameConfig;
 
         [Inject]
-        public void Construct(CollectionManager collectionManager)
+        public void Construct(CollectionManager collectionManager, GameConfig gameConfig, CatCollectionConfig catsConfig)
         {
             _collectionManager = collectionManager;
+            _gameConfig = gameConfig;
+            _catsConfig = catsConfig;
         }
 
         private void OnEnable()
         {
-            if (_collectionManager == null) return;
+            if (_collectionManager == null)
+            {
+                return;
+            }
 
             _collectionManager.OnItemCollected += HandleItemCollected;
             _collectionManager.OnCollectionChanged += HandleCollectionChanged;
 
-            UpdateUI(); 
+            // Initialize cat scores to "0" first
+            if (_catScoreTexts != null)
+            {
+                for (int i = 0; i < _catScoreTexts.Length; i++)
+                {
+                    if (_catScoreTexts[i] != null)
+                    {
+                        _catScoreTexts[i].text = "0";
+                    }
+                }
+            }
+
+            UpdateUI();
         }
 
         private void OnDisable()
@@ -62,7 +83,6 @@ namespace MergeGame.UI
         {
             ShowCollectionPopup($"{itemData.itemName} collected!");
             SpawnCollectParticles(position);
-
             UpdateUI();
         }
 
@@ -70,7 +90,6 @@ namespace MergeGame.UI
         {
             UpdateUI();
         }
-
 
         private void SpawnCollectParticles(Vector3 position)
         {
@@ -90,54 +109,55 @@ namespace MergeGame.UI
         /// </summary>
         private void UpdateUI()
         {
-            if (_collectionText == null) return;
+            if (_collectionText == null || _scoreText == null)
+            {
+                return;
+            }
 
             _textBuilder.Clear();
+            _textBuilder.Append($"Collected: {_collectionManager.TotalCollected}");
 
-            if (_trackedItems != null && _trackedItems.Length > 0)
+            // Iterate registered items for name display — these are real MergeItemData references
+            foreach (var kvp in _collectionManager.GetRegisteredItems())
             {
-                // Display specific tracked items
-                int total = 0;
-                foreach (var itemData in _trackedItems)
+                if (_showOnlyCollected && _collectionManager.GetAllCounts()[kvp.Key] == 0)
                 {
-                    if (itemData == null) continue;
-                    int count = _collectionManager != null ? _collectionManager.GetCount(itemData) : 0;
-                    total += count;
+                    continue;
                 }
 
-                _textBuilder.Append($" {total}");
-
-                foreach (var itemData in _trackedItems)
-                {
-                    if (itemData == null) continue;
-                    int count = _collectionManager != null ? _collectionManager.GetCount(itemData) : 0;
-                    if (_showOnlyCollected && count == 0) continue;
-                    _textBuilder.AppendLine();
-                    _textBuilder.Append($"{itemData.itemName}: {count}");
-                }
-            }
-            else
-            {
-                // Display all collected items from CollectionManager
-                if (_collectionManager != null)
-                {
-                    var allCounts = _collectionManager.GetAllCounts();
-                    int total = 0;
-                    foreach (var kvp in allCounts) total += kvp.Value;
-
-                    _textBuilder.Append($"Collected: {total}");
-
-                    foreach (var kvp in allCounts)
-                    {
-                        if (kvp.Key == null) continue;
-                        if (_showOnlyCollected && kvp.Value == 0) continue;
-                        _textBuilder.AppendLine();
-                        _textBuilder.Append($"{kvp.Key.itemName}: {kvp.Value}");
-                    }
-                }
+                _textBuilder.AppendLine();
+                _textBuilder.Append($"{kvp.Value.itemName}: {_collectionManager.GetAllCounts()[kvp.Key]}");
             }
 
             _collectionText.text = _textBuilder.ToString();
+            _scoreText.text = _collectionManager.TotalCollected.ToString();
+
+            UpdateCatScoresFromConfig();
+        }
+
+        private void UpdateCatScoresFromConfig()
+        {
+            if (_catScoreTexts == null || _catsConfig?.trackedItems == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _catsConfig.trackedItems.Length; i++)
+            {
+                MergeItemData item = _catsConfig.trackedItems[i];
+
+                if (item == null)
+                {
+                    continue;
+                }
+
+                int count = _collectionManager.GetCount(item);
+
+                if (i < _catScoreTexts.Length && _catScoreTexts[i] != null)
+                {
+                    _catScoreTexts[i].text = count.ToString();
+                }
+            }
         }
 
         private void ShowCollectionPopup(string message)

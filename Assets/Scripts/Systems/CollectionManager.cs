@@ -10,7 +10,6 @@ namespace MergeGame.Systems
     /// Centralized manager for tracking collected final items.
     /// Uses Action events for decoupled architecture.
     /// </summary>
-
     public class CollectionManager : MonoBehaviour
     {
         public int TotalCollected { get; private set; }
@@ -29,8 +28,11 @@ namespace MergeGame.Systems
         public event Action OnCollectionChanged;
         public event Action OnWinConditionMet;
 
-       // Dictionary to track count per item type
-        private readonly Dictionary<MergeItemData, int> _collectionCounts = new Dictionary<MergeItemData, int>();
+        // Dictionary to track count per item type, keyed by stable asset ID
+        private readonly Dictionary<string, int> _collectionCounts = new Dictionary<string, int>();
+
+        // Keeps MergeItemData references alive for display purposes
+        private readonly Dictionary<string, MergeItemData> _registeredItems = new Dictionary<string, MergeItemData>();
 
         private GameConfig _gameConfig;
 
@@ -39,13 +41,16 @@ namespace MergeGame.Systems
         {
             _gameConfig = gameConfig;
         }
-        
+
         /// <summary>
-        /// Register that an item has been collected
+        /// Register that an item has been collected.
         /// </summary>
         public void Collect(MergeItemData itemData, Vector3 worldPosition)
-        {
-            if (_gameOver) return;
+        {            
+            if (_gameOver)
+            {
+                return;
+            }
 
             if (itemData == null)
             {
@@ -59,20 +64,19 @@ namespace MergeGame.Systems
                 return;
             }
 
-            _collectionCounts.TryGetValue(itemData, out int currentCount);
-            _collectionCounts[itemData] = currentCount + 1;
+            string id = itemData.Id;
+
+            _collectionCounts.TryGetValue(id, out int currentCount);
+            _collectionCounts[id] = currentCount + 1;
+            _registeredItems[id] = itemData;
 
             TotalCollected++;
-
-            #if UNITY_EDITOR
-            Debug.Log($"CollectionManager: Collected {itemData.itemName}. Item count: {currentCount + 1}");
-            #endif
 
             OnItemCollected?.Invoke(itemData, currentCount + 1, worldPosition);
             OnCollectionChanged?.Invoke();
 
             CheckWinCondition();
-        }         
+        }
 
         private void CheckWinCondition()
         {
@@ -84,36 +88,49 @@ namespace MergeGame.Systems
         }
 
         /// <summary>
-        /// Get the collection count for a specific item type
+        /// Get the collection count for a specific item type.
         /// </summary>
         public int GetCount(MergeItemData itemData)
         {
-            if (itemData == null) return 0;
+            if (itemData == null)
+            {
+                return 0;
+            }
 
-            return _collectionCounts.TryGetValue(itemData, out int count) ? count : 0;
+            return _collectionCounts.TryGetValue(itemData.Id, out int count) ? count : 0;
         }
 
         /// <summary>
-        /// Get all collected items and their counts (read-only)
+        /// Get all collected item counts keyed by stable asset ID (read-only).
         /// </summary>
-        public IReadOnlyDictionary<MergeItemData, int> GetAllCounts()
+        public IReadOnlyDictionary<string, int> GetAllCounts()
         {
             return _collectionCounts;
         }
 
         /// <summary>
-        /// Reset all collection counts (useful for new game)
+        /// Get all registered MergeItemData references keyed by stable asset ID (read-only).
+        /// Used by UI to display item names without needing a separate config lookup.
+        /// </summary>
+        public IReadOnlyDictionary<string, MergeItemData> GetRegisteredItems()
+        {
+            return _registeredItems;
+        }
+
+        /// <summary>
+        /// Reset all collection counts (useful for new game).
         /// </summary>
         public void Reset()
         {
             _gameOver = false;
             _collectionCounts.Clear();
+            _registeredItems.Clear();
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             Debug.Log("CollectionManager: All counts reset");
-            #endif
+#endif
         }
     }
 }
