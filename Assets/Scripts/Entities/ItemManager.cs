@@ -10,31 +10,31 @@ namespace MergeGame.Entities
 {
     public class ItemManager : MonoBehaviour
     {
-        private const string ITEMS_PARENT_NAME = "Items";
-
         [SerializeField] private Item _itemPrefab;
 
         private GridManager _gridManager;
         private DiContainer _container;
         private AudioManager _audioManager;
         private CollectionManager _collectionManager;
+        private GameConfig _gameConfig;
 
         private ObjectPool<Item> _itemPool;
         private GameObject _itemsParent;
         private List<Item> _activeItems = new List<Item>();
 
         [Inject]
-        public void Construct(GridManager gridManager, DiContainer container, AudioManager audioManager, CollectionManager collectionManager)
+        public void Construct(GridManager gridManager, DiContainer container, AudioManager audioManager, CollectionManager collectionManager, GameConfig gameConfig)
         {
             _gridManager = gridManager;
             _container = container;
             _audioManager = audioManager;
             _collectionManager = collectionManager;
+            _gameConfig = gameConfig;
         }
 
         private void Awake()
         {
-            _itemsParent = new GameObject(ITEMS_PARENT_NAME);
+            _itemsParent = new GameObject(_gameConfig.itemsParentName);
 
             _itemPool = new ObjectPool<Item>(
                 createFunc: () => _container.InstantiatePrefabForComponent<Item>(_itemPrefab, _itemsParent.transform),

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using Zenject;
+using MergeGame.Data;
+
 
 namespace MergeGame.Grid
 {
@@ -23,15 +26,22 @@ namespace MergeGame.Grid
         private GameObject _tilesParent;
 
         private ObjectPool<Tile> _tilePool; // pooling
-        private const string TILES_PARENT_NAME = "Tiles";
         private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
 
         private float _tileSize;
         private Vector2 _startPos;
 
+        private GameConfig _gameConfig;
+
+        [Inject]
+        public void Construct(GameConfig gameConfig)
+        {
+            _gameConfig = gameConfig;
+        }
+
         private void Awake()
         {
-            _tilesParent = new GameObject(TILES_PARENT_NAME);
+            _tilesParent = new GameObject(_gameConfig.tilesParentName);
 
             _tilePool = new ObjectPool<Tile>(
                 createFunc: () => Instantiate(_tilePrefab, _tilesParent.transform),
