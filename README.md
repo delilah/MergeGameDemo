@@ -87,6 +87,8 @@ Game settings can be adjusted via ScriptableObjects:
 - More Tests
 
 ## CREDITS
+### Icons
+- Energy Drink icon by Icons8: https://icons8.com/icon/RdXmOQMUmZQf/energy-drink
 
 ### Sound Effects and Music
 
