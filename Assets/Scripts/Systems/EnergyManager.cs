@@ -3,12 +3,15 @@ using UnityEngine;
 using Zenject;
 using MergeGame.Data;
 using System.Collections;
+using System.Globalization;
+
+
 
 namespace MergeGame.Systems
 {
     public class EnergyManager : MonoBehaviour
     {
-        public event Action OnEnergyRegenerated;
+        public event Action OnEnergyChanged;
 
         public enum EnergyCost
         {
@@ -17,11 +20,18 @@ namespace MergeGame.Systems
             High = 3
         }
 
+        private const string PREF_ENERGY = "Energy";
+        private const string PREF_LAST_REGEN_TIME = "LastEnergyRegenerationTime";
+        private const string PREF_NEXT_REGEN_TIME = "NextEnergyRegenerationTime";
+
         private GameConfig _config;
 
         private int _maxEnergy;
         private int _currentEnergy;
         private Coroutine _regenerationCoroutine;
+
+        private DateTime _lastEnergyRegenerationTime;
+        private DateTime _nextEnergyRegenerationTime;
 
         [Inject]
         public void Construct(GameConfig gameConfig)
@@ -32,7 +42,51 @@ namespace MergeGame.Systems
         private void Awake()
         {
             _maxEnergy = _config.maxEnergy;
-            _currentEnergy = _maxEnergy;
+    
+            bool hasSavedEnergy = PlayerPrefs.HasKey(PREF_ENERGY);
+            bool hasSavedTime = PlayerPrefs.HasKey(PREF_LAST_REGEN_TIME);
+
+                
+            if (hasSavedEnergy && hasSavedTime)
+            {
+                Load();
+            }
+            else
+            {
+                _currentEnergy = _maxEnergy;
+                _lastEnergyRegenerationTime = DateTime.Now;
+                _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
+
+                Save(); 
+            }
+
+            CheckAndRegenerateIfNeeded();
+        }
+
+        private void CheckAndRegenerateIfNeeded()
+        {
+            if (_currentEnergy >= _maxEnergy)
+            {
+                return;
+            }
+
+            TimeSpan timePassed = DateTime.Now - _lastEnergyRegenerationTime;
+
+            int energyToRegenerate = (int)(timePassed.TotalSeconds / _config.regenEnergyTime);
+            energyToRegenerate = Mathf.Min(energyToRegenerate, _maxEnergy - _currentEnergy);
+
+            if (energyToRegenerate > 0)
+            {
+                _currentEnergy += energyToRegenerate;
+
+                // Preserve the partial cycle so the next unit continues from where it left off
+                double remainingSeconds = timePassed.TotalSeconds % _config.regenEnergyTime;
+                _lastEnergyRegenerationTime = DateTime.Now.AddSeconds(-remainingSeconds);
+                _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
+
+                OnEnergyChanged?.Invoke();
+                Save();
+            }
         }
 
         public int GetCurrentEnergy()
@@ -43,6 +97,28 @@ namespace MergeGame.Systems
         public int GetMaxEnergy()
         {
             return _maxEnergy;
+        }
+
+        public void Save()
+        {
+            PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
+            PlayerPrefs.SetString(PREF_LAST_REGEN_TIME, _lastEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+            PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public void Load()
+        {
+            _currentEnergy = PlayerPrefs.GetInt(PREF_ENERGY, _maxEnergy);
+            
+            _lastEnergyRegenerationTime = DateTime.Parse(
+                PlayerPrefs.GetString(PREF_LAST_REGEN_TIME, DateTime.Now.ToString(CultureInfo.InvariantCulture)),
+                CultureInfo.InvariantCulture
+            );
+            
+            _nextEnergyRegenerationTime = DateTime.Parse(
+                PlayerPrefs.GetString(PREF_NEXT_REGEN_TIME, DateTime.Now.ToString(CultureInfo.InvariantCulture)),
+                CultureInfo.InvariantCulture
+            );
         }
 
         /// <summary>
@@ -61,12 +137,14 @@ namespace MergeGame.Systems
             }
 
             _currentEnergy -= amount;
-            OnEnergyRegenerated?.Invoke();
+            OnEnergyChanged?.Invoke();
 
             if (_currentEnergy < _maxEnergy  && _regenerationCoroutine == null)
             {
                  _regenerationCoroutine = StartCoroutine(RegenerationCoroutine());
             }
+
+            PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
 
             return true;
         }
@@ -83,7 +161,14 @@ namespace MergeGame.Systems
                 if (_currentEnergy < _maxEnergy)
                 {
                     _currentEnergy++;
-                    OnEnergyRegenerated?.Invoke();
+                    OnEnergyChanged?.Invoke();
+
+                    _lastEnergyRegenerationTime = DateTime.Now;
+                    _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
+
+                    PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
+                    PlayerPrefs.SetString(PREF_LAST_REGEN_TIME, _lastEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+                    PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
                 }
             }
             

@@ -38,7 +38,7 @@ namespace MergeGame.UI
         {
             if (_energyManager != null)
             {
-                 _energyManager.OnEnergyRegenerated += UpdateEnergy;
+                 _energyManager.OnEnergyChanged += UpdateEnergy;
             }
 
             UpdateEnergy();
@@ -48,7 +48,7 @@ namespace MergeGame.UI
         {
             if (_energyManager != null)
             {
-                _energyManager.OnEnergyRegenerated -= UpdateEnergy;
+                _energyManager.OnEnergyChanged -= UpdateEnergy;
             }
         }
 
