@@ -63,6 +63,10 @@ namespace MergeGame.Systems
             CheckAndRegenerateIfNeeded();
         }
 
+        /// <summary>
+        /// Checks how much energy has regenerated based on timestamps and restores it.
+        /// Preserves the partial cycle so the next unit continues from where it left off.
+        /// </summary>
         private void CheckAndRegenerateIfNeeded()
         {
             if (_currentEnergy >= _maxEnergy)
@@ -87,6 +91,8 @@ namespace MergeGame.Systems
                 OnEnergyChanged?.Invoke();
                 Save();
             }
+
+            TryStartRegenerationCoroutine();
         }
 
         public int GetCurrentEnergy()
@@ -99,6 +105,9 @@ namespace MergeGame.Systems
             return _maxEnergy;
         }
 
+        /// <summary>
+        /// Saves data to PlayerPrefs.
+        /// </summary>
         public void Save()
         {
             PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
@@ -106,6 +115,9 @@ namespace MergeGame.Systems
             PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
         }
 
+        /// <summary>
+        /// Loads data from PlayerPrefs.
+        /// </summary>
         public void Load()
         {
             _currentEnergy = PlayerPrefs.GetInt(PREF_ENERGY, _maxEnergy);
@@ -131,7 +143,7 @@ namespace MergeGame.Systems
         {
             int amount = (int)cost;
 
-            if (_currentEnergy <= 0 || _currentEnergy < amount)
+            if (_currentEnergy < amount)
             {
                 return false;
             }
@@ -139,14 +151,22 @@ namespace MergeGame.Systems
             _currentEnergy -= amount;
             OnEnergyChanged?.Invoke();
 
-            if (_currentEnergy < _maxEnergy  && _regenerationCoroutine == null)
-            {
-                 _regenerationCoroutine = StartCoroutine(RegenerationCoroutine());
-            }
-
-            PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
+            TryStartRegenerationCoroutine();
+            Save();
 
             return true;
+        }
+
+        /// <summary>
+        /// Starts the regeneration coroutine only if not already running and energy is below max.
+        /// Centralised to prevent double start race conditions.
+        /// </summary>
+        private void TryStartRegenerationCoroutine()
+        {
+            if (_currentEnergy < _maxEnergy && _regenerationCoroutine == null)
+            {
+                _regenerationCoroutine = StartCoroutine(RegenerationCoroutine());
+            }
         }
 
         /// <summary>
@@ -166,9 +186,7 @@ namespace MergeGame.Systems
                     _lastEnergyRegenerationTime = DateTime.Now;
                     _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
 
-                    PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
-                    PlayerPrefs.SetString(PREF_LAST_REGEN_TIME, _lastEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
-                    PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+                    Save();
                 }
             }
             
