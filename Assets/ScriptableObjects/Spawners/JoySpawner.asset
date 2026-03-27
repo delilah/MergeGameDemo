@@ -19,4 +19,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5fd6b1e5a2fc22c4789b1b72223f1edf, type: 2}
   - {fileID: 11400000, guid: 9602b718f127b354b973eff5b70d9c5a, type: 2}
   - {fileID: 11400000, guid: 79f8a8ab2015bbd428a6475d749eb870, type: 2}
-  spawnCooldown: 0.2
+  spawnInterval: 0.2
+  maxSpawnCount: 20
+  rechargeDuration: 10

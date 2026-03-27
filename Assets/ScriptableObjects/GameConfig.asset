@@ -27,4 +27,8 @@ MonoBehaviour:
   backgroundSprite: {fileID: 0}
   backgroundColor: {r: 1, g: 1, b: 1, a: 1}
   spawnerPlacementStart: {x: 3, y: 3}
+  itemsParentName: Items
+  tilesParentName: Tiles
+  dragSortingOrderOffset: 20
+  targetFrameRate: 60
   catCollectionConfig: {fileID: 11400000, guid: f9ec9217cd55fe74f8b788cae187ebb6, type: 2}
