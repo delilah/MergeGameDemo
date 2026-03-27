@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 using MergeGame.Data;
+using System.Collections;
 
 namespace MergeGame.Systems
 {
@@ -20,7 +21,7 @@ namespace MergeGame.Systems
 
         private int _maxEnergy;
         private int _currentEnergy;
-        private float _regenTimer = 0f;
+        private Coroutine _regenerationCoroutine;
 
         [Inject]
         public void Construct(GameConfig gameConfig)
@@ -34,14 +35,6 @@ namespace MergeGame.Systems
             _currentEnergy = _maxEnergy;
         }
 
-        private void Update()
-        {
-            if (_currentEnergy < _maxEnergy)
-            {
-                RegenerateEnergy();
-            }
-        }
-
         public int GetCurrentEnergy()
         {
             return _currentEnergy;
@@ -50,21 +43,6 @@ namespace MergeGame.Systems
         public int GetMaxEnergy()
         {
             return _maxEnergy;
-        }
-
-        /// <summary>
-        /// Regenerates 1 energy unit every regenEnergyTime seconds.
-        /// </summary>
-        private void RegenerateEnergy()
-        {
-            _regenTimer += Time.deltaTime;
-
-            if (_regenTimer >= _config.regenEnergyTime)
-            {
-                _currentEnergy++;
-                OnEnergyRegenerated?.Invoke();
-                _regenTimer = 0f;
-            }
         }
 
         /// <summary>
@@ -84,8 +62,32 @@ namespace MergeGame.Systems
 
             _currentEnergy -= amount;
             OnEnergyRegenerated?.Invoke();
-            _regenTimer = 0f;
+
+            if (_currentEnergy < _maxEnergy  && _regenerationCoroutine == null)
+            {
+                 _regenerationCoroutine = StartCoroutine(RegenerationCoroutine());
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Regenerates 1 energy unit every regenEnergyTime seconds.
+        /// </summary>
+        private IEnumerator RegenerationCoroutine()
+        {
+            while (_currentEnergy < _maxEnergy)
+            {
+                yield return new WaitForSeconds(_config.regenEnergyTime);
+                
+                if (_currentEnergy < _maxEnergy)
+                {
+                    _currentEnergy++;
+                    OnEnergyRegenerated?.Invoke();
+                }
+            }
+            
+            _regenerationCoroutine = null;
         }
     }
 }
