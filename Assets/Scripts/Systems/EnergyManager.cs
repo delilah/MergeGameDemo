@@ -47,6 +47,11 @@ namespace MergeGame.Systems
             return _currentEnergy;
         }
 
+        public int GetMaxEnergy()
+        {
+            return _maxEnergy;
+        }
+
         /// <summary>
         /// Regenerates 1 energy unit every regenEnergyTime seconds.
         /// </summary>

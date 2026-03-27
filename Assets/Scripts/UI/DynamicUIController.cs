@@ -16,6 +16,7 @@ namespace MergeGame.UI
     {
         [Header("UI References")]
         [SerializeField] private TMP_Text _energyLevelText;
+        [SerializeField] private Slider _energyLevelBar;
 
         private EnergyManager _energyManager;
 
@@ -53,11 +54,18 @@ namespace MergeGame.UI
 
         private void UpdateEnergy()
         {
-            Debug.Log("before");
             if (_energyManager != null)
             {
-                Debug.Log("after");
-                _energyLevelText.text = _energyManager.GetCurrentEnergy().ToString();
+                if (_energyLevelText != null)
+                {
+                    _energyLevelText.text = _energyManager.GetCurrentEnergy().ToString();
+                }
+
+                if (_energyLevelBar != null)
+                {
+                    _energyLevelBar.maxValue = _energyManager.GetMaxEnergy();
+                    _energyLevelBar.value = _energyManager.GetCurrentEnergy();
+                }
             }
         }
     }
