@@ -36,7 +36,7 @@ Game settings can be adjusted via ScriptableObjects:
   - Items to win threshold
   - Audio clips and volumes
   - Visual settings
-  - TO BE EXPANDED
+  - and more general config data
 
 - **Item Data** (`Assets/ScriptableObjects/Items/`):
   - Item names and sprites
@@ -45,7 +45,9 @@ Game settings can be adjusted via ScriptableObjects:
 
 - **Spawner Data** (`Assets/ScriptableObjects/Spawners/`):
   - Spawnable item pools
-  - Spawn cooldown duration
+  - Spawn rate/Interval duration
+  - Max Spawn Count
+  - Recharge Duration
 
 ## How to Play
 
