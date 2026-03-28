@@ -12,6 +12,7 @@ namespace MergeGame.Systems
     public class EnergyManager : MonoBehaviour
     {
         public event Action OnEnergyChanged;
+        public event Action OnEnergyRestored; // fires specifically when crossing 0 -> 1
 
         public enum EnergyCost
         {
@@ -53,7 +54,7 @@ namespace MergeGame.Systems
             }
             else
             {
-                _currentEnergy = _maxEnergy;
+                SetEnergy(_maxEnergy);
                 _lastEnergyRegenerationTime = DateTime.Now;
                 _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
 
@@ -105,6 +106,19 @@ namespace MergeGame.Systems
             return _maxEnergy;
         }
 
+        private void SetEnergy(int newValue)
+        {
+            var _previousEnergy = _currentEnergy;
+            _currentEnergy = newValue;
+
+            OnEnergyChanged?.Invoke();
+
+            if (_previousEnergy == 0 && _currentEnergy == 1)
+            {
+                OnEnergyRestored?.Invoke();
+            }
+        }
+
         /// <summary>
         /// Saves data to PlayerPrefs.
         /// </summary>
@@ -120,7 +134,7 @@ namespace MergeGame.Systems
         /// </summary>
         public void Load()
         {
-            _currentEnergy = PlayerPrefs.GetInt(PREF_ENERGY, _maxEnergy);
+            SetEnergy(PlayerPrefs.GetInt(PREF_ENERGY, _maxEnergy));
             
             _lastEnergyRegenerationTime = DateTime.Parse(
                 PlayerPrefs.GetString(PREF_LAST_REGEN_TIME, DateTime.Now.ToString(CultureInfo.InvariantCulture)),
@@ -148,7 +162,7 @@ namespace MergeGame.Systems
                 return false;
             }
 
-            _currentEnergy -= amount;
+            SetEnergy(_currentEnergy - amount);
             OnEnergyChanged?.Invoke();
 
             TryStartRegenerationCoroutine();
@@ -180,7 +194,7 @@ namespace MergeGame.Systems
                 
                 if (_currentEnergy < _maxEnergy)
                 {
-                    _currentEnergy++;
+                    SetEnergy(_currentEnergy + 1);
                     OnEnergyChanged?.Invoke();
 
                     _lastEnergyRegenerationTime = DateTime.Now;

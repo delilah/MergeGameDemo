@@ -103,6 +103,11 @@ namespace MergeGame.Entities
             EnsureColliderSized();
         }
 
+        private void Start()
+        {
+            _energyManager.OnEnergyRestored += OnEnergyRestored;
+        }
+
         private void Update()
         {
             if (_isRecharging)
@@ -114,8 +119,20 @@ namespace MergeGame.Entities
                     _isRecharging = false;
                     _rechargeTimer = 0f;
                     _spawnCount = 0;
-                    IntroSpawnerAnimation();
+                    
+                    if (_energyManager.GetCurrentEnergy() > 0) // Only animate if the player can actually spawn
+                    {
+                        IntroSpawnerAnimation();
+                    }
                 }
+            }
+        }
+
+        private void OnEnergyRestored()
+        {
+            if (!_isRecharging)
+            {
+                IntroSpawnerAnimation();
             }
         }
 
@@ -173,7 +190,9 @@ namespace MergeGame.Entities
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (_isRecharging)
+            var isEnergyLeft = (_energyManager.GetCurrentEnergy() > 0);
+
+            if (_isRecharging || !isEnergyLeft)
             {
                 return;
             }
@@ -270,6 +289,7 @@ namespace MergeGame.Entities
             {
                 _isRecharging = true;
                 _rechargeTimer = 0f;
+                StopIntroSpawnerAnimation();
                 Debug.Log("Spawner exhausted, recharging.");
             }
         }
@@ -297,6 +317,8 @@ namespace MergeGame.Entities
 
         private void OnDisable()
         {
+            _energyManager.OnEnergyRestored -= OnEnergyRestored;
+
             transform.DOKill();
             _spawnerManager.ClearActiveSpawner(this);
             SetSelected(false);
