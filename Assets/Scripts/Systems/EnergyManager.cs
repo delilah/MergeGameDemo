@@ -163,7 +163,6 @@ namespace MergeGame.Systems
             }
 
             SetEnergy(_currentEnergy - amount);
-            OnEnergyChanged?.Invoke();
 
             TryStartRegenerationCoroutine();
             Save();
