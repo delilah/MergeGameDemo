@@ -11,7 +11,7 @@ It is a very small project by design, for learning and practice purposes.
 ## Setup Instructions
 
 ### Requirements
-- Unity 2022.3 LTS or newer
+- Unity 6.3 LTS or newer
 - TextMeshPro package (included)
 - Universal Render Pipeline (URP)
 

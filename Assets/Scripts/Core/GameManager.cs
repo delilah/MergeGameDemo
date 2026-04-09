@@ -5,6 +5,8 @@ using MergeGame.Systems;
 using MergeGame.Grid;
 using MergeGame.Entities;
 using MergeGame.Data;
+using UnityEngine.InputSystem;
+
 
 namespace MergeGame.Core
 {
@@ -41,7 +43,7 @@ namespace MergeGame.Core
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
 #if !UNITY_WEBGL
                 Application.Quit();

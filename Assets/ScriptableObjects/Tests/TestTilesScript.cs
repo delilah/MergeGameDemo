@@ -28,60 +28,63 @@ public class TestTilesScript
         // Initialize SfxConfig to prevent null reference in AudioManager
         _gameConfig.sfx = new SfxConfig();
 
-        // Create GridManager
+        // Create GridManager and inject BEFORE Awake()
         var gridManagerGo = new GameObject("GridManager");
         _gridManager = gridManagerGo.AddComponent<GridManager>();
         _toCleanup.Add(gridManagerGo);
+        
+        // Manual injection BEFORE Unity calls Awake
+        var gridConfigField = typeof(GridManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
+        gridConfigField?.SetValue(_gridManager, _gameConfig);
 
-        // Create CollectionManager
+        // Create CollectionManager and inject
         var collectionManagerGo = new GameObject("CollectionManager");
         _collectionManager = collectionManagerGo.AddComponent<CollectionManager>();
         _toCleanup.Add(collectionManagerGo);
-
-        // Manually inject GameConfig into CollectionManager
+        
         var collectionConfigField = typeof(CollectionManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
         collectionConfigField?.SetValue(_collectionManager, _gameConfig);
 
-        // Create AudioManager
+        // Create AudioManager and inject
         var audioManagerGo = new GameObject("AudioManager");
         _audioManager = audioManagerGo.AddComponent<AudioManager>();
-
-        // Add and configure required AudioSource components
         var sfxSource = audioManagerGo.AddComponent<AudioSource>();
         var musicSource = audioManagerGo.AddComponent<AudioSource>();
-
-        // Inject AudioSource references into AudioManager
-        var sfxSourceField = typeof(AudioManager).GetField("_sfxSource", BindingFlags.NonPublic | BindingFlags.Instance);
-        sfxSourceField?.SetValue(_audioManager, sfxSource);
-        var musicSourceField = typeof(AudioManager).GetField("_musicSource", BindingFlags.NonPublic | BindingFlags.Instance);
-        musicSourceField?.SetValue(_audioManager, musicSource);
-
-        _toCleanup.Add(audioManagerGo);
-
-        // Manually inject dependencies into AudioManager
+        
         var audioConfigField = typeof(AudioManager).GetField("_config", BindingFlags.NonPublic | BindingFlags.Instance);
         audioConfigField?.SetValue(_audioManager, _gameConfig);
         var audioCollectionField = typeof(AudioManager).GetField("_collectionManager", BindingFlags.NonPublic | BindingFlags.Instance);
         audioCollectionField?.SetValue(_audioManager, _collectionManager);
+        var sfxSourceField = typeof(AudioManager).GetField("_sfxSource", BindingFlags.NonPublic | BindingFlags.Instance);
+        sfxSourceField?.SetValue(_audioManager, sfxSource);
+        var musicSourceField = typeof(AudioManager).GetField("_musicSource", BindingFlags.NonPublic | BindingFlags.Instance);
+        musicSourceField?.SetValue(_audioManager, musicSource);
+        
+        _toCleanup.Add(audioManagerGo);
 
-        // Create ItemManager
+        // Create ItemManager and inject BEFORE Awake()
         var itemManagerGo = new GameObject("ItemManager");
         _itemManager = itemManagerGo.AddComponent<ItemManager>();
         _toCleanup.Add(itemManagerGo);
-
-        // Manually inject dependencies into ItemManager
+        
+        // Manual injection BEFORE Unity calls Awake
         var imGridField = typeof(ItemManager).GetField("_gridManager", BindingFlags.NonPublic | BindingFlags.Instance);
         imGridField?.SetValue(_itemManager, _gridManager);
         var imAudioField = typeof(ItemManager).GetField("_audioManager", BindingFlags.NonPublic | BindingFlags.Instance);
         imAudioField?.SetValue(_itemManager, _audioManager);
         var imCollectionField = typeof(ItemManager).GetField("_collectionManager", BindingFlags.NonPublic | BindingFlags.Instance);
         imCollectionField?.SetValue(_itemManager, _collectionManager);
+        var imContainerField = typeof(ItemManager).GetField("_container", BindingFlags.NonPublic | BindingFlags.Instance);
+        imContainerField?.SetValue(_itemManager, null); // Not used in tests
+        var imGameConfigField = typeof(ItemManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
+        imGameConfigField?.SetValue(_itemManager, _gameConfig);
 
-        // Force Awake to initialize the item pool
-        // SendMessage is avoided here as Zenject intercepts Unity lifecycle messages
-        // in the editor and asserts the object is part of a scene context
-        var awakeMethod = typeof(ItemManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
-        awakeMethod?.Invoke(_itemManager, null);
+        // Now manually call Awake after injection is complete
+        var gridAwakeMethod = typeof(GridManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
+        gridAwakeMethod?.Invoke(_gridManager, null);
+        
+        var itemAwakeMethod = typeof(ItemManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
+        itemAwakeMethod?.Invoke(_itemManager, null);
     }
 
     [TearDown]
