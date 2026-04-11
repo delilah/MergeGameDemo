@@ -55,13 +55,41 @@ namespace MergeGame.Systems
             else
             {
                 SetEnergy(_maxEnergy);
-                _lastEnergyRegenerationTime = DateTime.Now;
+                _lastEnergyRegenerationTime = DateTime.UtcNow;
                 _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
 
                 Save(); 
             }
 
             CheckAndRegenerateIfNeeded();
+        }
+
+        // If app is in background, doesn't go through awake so OnApplicationFocus is used
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                CheckAndRegenerateIfNeeded();
+            }
+        }
+
+        // If app goes in background gets paused: save
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+            {
+                Save();
+            }
+            else
+            {
+                CheckAndRegenerateIfNeeded();
+            }
+        }
+
+        // On app quit: save
+        private void OnApplicationQuit()
+        {
+            Save();
         }
 
         /// <summary>
@@ -75,7 +103,7 @@ namespace MergeGame.Systems
                 return;
             }
 
-            TimeSpan timePassed = DateTime.Now - _lastEnergyRegenerationTime;
+            TimeSpan timePassed = DateTime.UtcNow - _lastEnergyRegenerationTime;
 
             int energyToRegenerate = (int)(timePassed.TotalSeconds / _config.regenEnergyTime);
             energyToRegenerate = Mathf.Min(energyToRegenerate, _maxEnergy - _currentEnergy);
@@ -86,7 +114,7 @@ namespace MergeGame.Systems
 
                 // Preserve the partial cycle so the next unit continues from where it left off
                 double remainingSeconds = timePassed.TotalSeconds % _config.regenEnergyTime;
-                _lastEnergyRegenerationTime = DateTime.Now.AddSeconds(-remainingSeconds);
+                _lastEnergyRegenerationTime = DateTime.UtcNow.AddSeconds(-remainingSeconds);
                 _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
 
                 OnEnergyChanged?.Invoke();
@@ -132,19 +160,36 @@ namespace MergeGame.Systems
         /// <summary>
         /// Loads data from PlayerPrefs.
         /// </summary>
-        public void Load()
+        private void Load()
         {
             SetEnergy(PlayerPrefs.GetInt(PREF_ENERGY, _maxEnergy));
             
-            _lastEnergyRegenerationTime = DateTime.Parse(
-                PlayerPrefs.GetString(PREF_LAST_REGEN_TIME, DateTime.Now.ToString(CultureInfo.InvariantCulture)),
-                CultureInfo.InvariantCulture
-            );
+            DateTime currentTime = DateTime.UtcNow;
+            DateTime lastRegenTime, nextRegenTime;
             
-            _nextEnergyRegenerationTime = DateTime.Parse(
-                PlayerPrefs.GetString(PREF_NEXT_REGEN_TIME, DateTime.Now.ToString(CultureInfo.InvariantCulture)),
-                CultureInfo.InvariantCulture
-            );
+            // Parse last regeneration time with validation
+            string lastRegenString = PlayerPrefs.GetString(PREF_LAST_REGEN_TIME, "");
+            if (string.IsNullOrEmpty(lastRegenString) || 
+                !DateTime.TryParse(lastRegenString, CultureInfo.InvariantCulture, DateTimeStyles.None, out lastRegenTime) ||
+                lastRegenTime > currentTime)
+            {
+                // Reset to current time if invalid or in the future
+                lastRegenTime = currentTime;
+            }
+            
+            // Parse next regeneration time with validation
+            string nextRegenString = PlayerPrefs.GetString(PREF_NEXT_REGEN_TIME, "");
+            if (string.IsNullOrEmpty(nextRegenString) || 
+                !DateTime.TryParse(nextRegenString, CultureInfo.InvariantCulture, DateTimeStyles.None, out nextRegenTime) ||
+                nextRegenTime <= lastRegenTime || 
+                nextRegenTime > currentTime.AddHours(24)) // Reasonable future limit (24 hours)
+            {
+                // Calculate valid next regeneration time
+                nextRegenTime = lastRegenTime.AddSeconds(_config.regenEnergyTime);
+            }
+            
+            _lastEnergyRegenerationTime = lastRegenTime;
+            _nextEnergyRegenerationTime = nextRegenTime;
         }
 
         /// <summary>
@@ -194,9 +239,8 @@ namespace MergeGame.Systems
                 if (_currentEnergy < _maxEnergy)
                 {
                     SetEnergy(_currentEnergy + 1);
-                    OnEnergyChanged?.Invoke();
 
-                    _lastEnergyRegenerationTime = DateTime.Now;
+                    _lastEnergyRegenerationTime = DateTime.UtcNow;
                     _nextEnergyRegenerationTime = _lastEnergyRegenerationTime.AddSeconds(_config.regenEnergyTime);
 
                     Save();
