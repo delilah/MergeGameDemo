@@ -13,6 +13,7 @@ namespace MergeGame.Systems
     {
         public event Action OnEnergyChanged;
         public event Action OnEnergyRestored; // fires specifically when crossing 0 -> 1
+        private bool _isInitialized = false;
 
         public enum EnergyCost
         {
@@ -62,6 +63,7 @@ namespace MergeGame.Systems
             }
 
             CheckAndRegenerateIfNeeded();
+            _isInitialized = true;
         }
 
         // If app is in background, doesn't go through awake so OnApplicationFocus is used
@@ -141,7 +143,7 @@ namespace MergeGame.Systems
 
             OnEnergyChanged?.Invoke();
 
-            if (_previousEnergy == 0 && _currentEnergy == 1)
+            if (_isInitialized && _previousEnergy == 0 && _currentEnergy == 1)
             {
                 OnEnergyRestored?.Invoke();
             }
