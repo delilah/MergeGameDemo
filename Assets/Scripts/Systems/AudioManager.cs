@@ -9,10 +9,10 @@ namespace MergeGame.Systems
         [SerializeField] private AudioSource _sfxSource;
         [SerializeField] private AudioSource _musicSource;
 
+        public enum MergeCategory { Items, Kittens, Generic }
+
         private CollectionManager _collectionManager;
         private GameConfig _config;
-
-        public enum MergeCategory { Items, Kittens, Generic }
 
         [Inject]
         public void Construct(GameConfig gameConfig, CollectionManager collectionManager)

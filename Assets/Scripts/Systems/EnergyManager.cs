@@ -13,7 +13,6 @@ namespace MergeGame.Systems
     {
         public event Action OnEnergyChanged;
         public event Action OnEnergyRestored; // fires specifically when crossing 0 -> 1
-        private bool _isInitialized = false;
 
         public enum EnergyCost
         {
@@ -30,6 +29,7 @@ namespace MergeGame.Systems
 
         private int _maxEnergy;
         private int _currentEnergy;
+        private bool _isInitialized = false;
         private Coroutine _regenerationCoroutine;
 
         private DateTime _lastEnergyRegenerationTime;
@@ -94,6 +94,49 @@ namespace MergeGame.Systems
             Save();
         }
 
+        public int GetCurrentEnergy()
+        {
+            return _currentEnergy;
+        }
+
+        public int GetMaxEnergy()
+        {
+            return _maxEnergy;
+        }
+
+        /// <summary>
+        /// Saves data to PlayerPrefs.
+        /// </summary>
+        public void Save()
+        {
+            PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
+            PlayerPrefs.SetString(PREF_LAST_REGEN_TIME, _lastEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+            PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// Attempts to spend energy based on the specified cost.
+        /// Resets the regen timer on success so the next unit takes a full cycle.
+        /// </summary>
+        /// <param name="cost">The energy cost to spend.</param>
+        /// <returns>True if energy was spent, false if there was not enough energy.</returns>
+        public bool TrySpendEnergy(EnergyCost cost = EnergyCost.Base)
+        {
+            int amount = (int)cost;
+
+            if (_currentEnergy < amount)
+            {
+                return false;
+            }
+
+            SetEnergy(_currentEnergy - amount);
+
+            TryStartRegenerationCoroutine();
+            Save();
+
+            return true;
+        }
+
         /// <summary>
         /// Checks how much energy has regenerated based on timestamps and restores it.
         /// Preserves the partial cycle so the next unit continues from where it left off.
@@ -126,16 +169,6 @@ namespace MergeGame.Systems
             TryStartRegenerationCoroutine();
         }
 
-        public int GetCurrentEnergy()
-        {
-            return _currentEnergy;
-        }
-
-        public int GetMaxEnergy()
-        {
-            return _maxEnergy;
-        }
-
         private void SetEnergy(int newValue)
         {
             var _previousEnergy = _currentEnergy;
@@ -147,16 +180,6 @@ namespace MergeGame.Systems
             {
                 OnEnergyRestored?.Invoke();
             }
-        }
-
-        /// <summary>
-        /// Saves data to PlayerPrefs.
-        /// </summary>
-        public void Save()
-        {
-            PlayerPrefs.SetInt(PREF_ENERGY, _currentEnergy);
-            PlayerPrefs.SetString(PREF_LAST_REGEN_TIME, _lastEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
-            PlayerPrefs.SetString(PREF_NEXT_REGEN_TIME, _nextEnergyRegenerationTime.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -192,29 +215,6 @@ namespace MergeGame.Systems
             
             _lastEnergyRegenerationTime = lastRegenTime;
             _nextEnergyRegenerationTime = nextRegenTime;
-        }
-
-        /// <summary>
-        /// Attempts to spend energy based on the specified cost.
-        /// Resets the regen timer on success so the next unit takes a full cycle.
-        /// </summary>
-        /// <param name="cost">The energy cost to spend.</param>
-        /// <returns>True if energy was spent, false if there was not enough energy.</returns>
-        public bool TrySpendEnergy(EnergyCost cost = EnergyCost.Base)
-        {
-            int amount = (int)cost;
-
-            if (_currentEnergy < amount)
-            {
-                return false;
-            }
-
-            SetEnergy(_currentEnergy - amount);
-
-            TryStartRegenerationCoroutine();
-            Save();
-
-            return true;
         }
 
         /// <summary>

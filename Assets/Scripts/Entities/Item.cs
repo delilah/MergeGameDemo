@@ -15,7 +15,6 @@ namespace MergeGame.Entities
 
         [Header("Item Data")]
         [SerializeField] private MergeItemData _data;
-        public MergeItemData Data => _data;
 
         private Tile _currentTile;
         private Vector3 _startPosition;
@@ -27,12 +26,37 @@ namespace MergeGame.Entities
         private ItemManager _itemManager;   // handles merge, collect, and pool return
         private GameConfig _gameConfig;
 
+        public MergeItemData Data => _data;
+        public Tile CurrentTile => _currentTile;
+
         [Inject]
         public void Construct(GridManager gridManager, ItemManager itemManager, GameConfig gameConfig)
         {
             _gridManager = gridManager;
             _itemManager = itemManager;
             _gameConfig = gameConfig;
+        }
+
+        private void Awake()
+        {
+            _mainCamera = Camera.main;
+
+            if (_spriteRenderer == null)
+            {
+                _spriteRenderer = GetComponent<SpriteRenderer>();
+            }
+
+            if (_collider == null)
+            {
+                _collider = GetComponent<BoxCollider2D>();
+            }
+
+            if (_collider == null)
+            {
+                _collider = gameObject.AddComponent<BoxCollider2D>();
+            }
+
+            EnsureColliderSized();
         }
 
         /// <summary>
@@ -76,50 +100,6 @@ namespace MergeGame.Entities
         public void ClearTile()
         {
             _currentTile = null;
-        }
-
-        public Tile CurrentTile => _currentTile;
-
-        private void Awake()
-        {
-            _mainCamera = Camera.main;
-
-            if (_spriteRenderer == null)
-            {
-                _spriteRenderer = GetComponent<SpriteRenderer>();
-            }
-
-            if (_collider == null)
-            {
-                _collider = GetComponent<BoxCollider2D>();
-            }
-
-            if (_collider == null)
-            {
-                _collider = gameObject.AddComponent<BoxCollider2D>();
-            }
-
-            EnsureColliderSized();
-        }
-
-        private void EnsureColliderSized()
-        {
-            if (_collider == null)
-            {
-                return;
-            }
-
-            if (_spriteRenderer != null && _spriteRenderer.sprite != null)
-            {
-                Vector2 localSize = _spriteRenderer.sprite.bounds.size;
-                if (localSize.x <= 0.01f || localSize.y <= 0.01f)
-                {
-                    localSize = new Vector2(1f, 1f);
-                }
-                _collider.size = localSize;
-                _collider.offset = Vector2.zero;
-                _collider.enabled = true;
-            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
@@ -223,6 +203,26 @@ namespace MergeGame.Entities
             _currentTile?.RemoveItem();
             ClearTile();
             _itemManager.ReturnItemToPool(this);
+        }
+
+        private void EnsureColliderSized()
+        {
+            if (_collider == null)
+            {
+                return;
+            }
+
+            if (_spriteRenderer != null && _spriteRenderer.sprite != null)
+            {
+                Vector2 localSize = _spriteRenderer.sprite.bounds.size;
+                if (localSize.x <= 0.01f || localSize.y <= 0.01f)
+                {
+                    localSize = new Vector2(1f, 1f);
+                }
+                _collider.size = localSize;
+                _collider.offset = Vector2.zero;
+                _collider.enabled = true;
+            }
         }
     }
 }

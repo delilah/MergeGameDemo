@@ -45,37 +45,6 @@ namespace MergeGame.Entities
             _energyManager = energyManager;
         }
 
-        /// <summary>
-        /// Initializes the spawner with the given data. Must be called after instantiation.
-        /// </summary>
-        public void Initialize(SpawnerData data, bool playIntroAnimation = false)
-        {
-            _spawnerData = data;
-            if (_spriteRenderer != null && _spawnerData != null && _spawnerData.sprite != null)
-            {
-                _spriteRenderer.sprite = _spawnerData.sprite;
-            }
-
-            PrecomputeSpawnableCandidates();
-
-            _playIntroAnimation = playIntroAnimation;
-        }
-
-        private void PrecomputeSpawnableCandidates()
-        {
-            _spawnableCandidates.Clear();
-            if (_spawnerData != null && _spawnerData.spawnableItems != null)
-            {
-                for (int i = 0; i < _spawnerData.spawnableItems.Length; i++)
-                {
-                    if (_spawnerData.spawnableItems[i] != null)
-                    {
-                        _spawnableCandidates.Add(_spawnerData.spawnableItems[i]);
-                    }
-                }
-            }
-        }
-
         private void Awake()
         {
             if (_spriteRenderer == null)
@@ -128,12 +97,38 @@ namespace MergeGame.Entities
             }
         }
 
-        private void OnEnergyRestored()
+        private void OnDisable()
         {
-            if (!_isRecharging)
+            _energyManager.OnEnergyRestored -= OnEnergyRestored;
+
+            transform.DOKill();
+            _spawnerManager.ClearActiveSpawner(this);
+            SetSelected(false);
+        }
+
+        // NOTE: added OnDestroy to clear active spawner if this spawner is destroyed.
+        // OnDisable is not reliably called on destroyed objects during scene reloads,
+        // so without this _spawnerManager could hold a stale reference to a destroyed spawner.
+        private void OnDestroy()
+        {
+            transform.DOKill();
+            _spawnerManager.ClearActiveSpawner(this);
+        }
+
+        /// <summary>
+        /// Initializes the spawner with the given data. Must be called after instantiation.
+        /// </summary>
+        public void Initialize(SpawnerData data, bool playIntroAnimation = false)
+        {
+            _spawnerData = data;
+            if (_spriteRenderer != null && _spawnerData != null && _spawnerData.sprite != null)
             {
-                IntroSpawnerAnimation();
+                _spriteRenderer.sprite = _spawnerData.sprite;
             }
+
+            PrecomputeSpawnableCandidates();
+
+            _playIntroAnimation = playIntroAnimation;
         }
 
         /// <summary>
@@ -221,6 +216,19 @@ namespace MergeGame.Entities
             }
         }
 
+        public void SetTile(Tile tile)
+        {
+            _tile = tile;
+        }
+
+        private void OnEnergyRestored()
+        {
+            if (!_isRecharging)
+            {
+                IntroSpawnerAnimation();
+            }
+        }
+
         private void TrySpawn()
         {
             if (_spawnerData == null)
@@ -294,9 +302,19 @@ namespace MergeGame.Entities
             }
         }
 
-        public void SetTile(Tile tile)
+        private void PrecomputeSpawnableCandidates()
         {
-            _tile = tile;
+            _spawnableCandidates.Clear();
+            if (_spawnerData != null && _spawnerData.spawnableItems != null)
+            {
+                for (int i = 0; i < _spawnerData.spawnableItems.Length; i++)
+                {
+                    if (_spawnerData.spawnableItems[i] != null)
+                    {
+                        _spawnableCandidates.Add(_spawnerData.spawnableItems[i]);
+                    }
+                }
+            }
         }
 
         private void EnsureColliderSized()
@@ -313,24 +331,6 @@ namespace MergeGame.Entities
                 box.offset = Vector2.zero;
                 box.enabled = true;
             }
-        }
-
-        private void OnDisable()
-        {
-            _energyManager.OnEnergyRestored -= OnEnergyRestored;
-
-            transform.DOKill();
-            _spawnerManager.ClearActiveSpawner(this);
-            SetSelected(false);
-        }
-
-        // NOTE: added OnDestroy to clear active spawner if this spawner is destroyed.
-        // OnDisable is not reliably called on destroyed objects during scene reloads,
-        // so without this _spawnerManager could hold a stale reference to a destroyed spawner.
-        private void OnDestroy()
-        {
-            transform.DOKill();
-            _spawnerManager.ClearActiveSpawner(this);
         }
     }
 }

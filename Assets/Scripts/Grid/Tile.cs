@@ -15,19 +15,20 @@ namespace MergeGame.Grid
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private GameObject _highlight;
 
-        public bool HasItem() => _currentItem != null;
-        public Item GetItem() => _currentItem;
-        public bool HasSpawner() => _currentSpawner != null;
-        public Spawner GetSpawner() => _currentSpawner;
-
-        // True only when the tile has no item AND no spawner on it.
-        public bool IsEmpty => _currentSpawner == null && _currentItem == null;
-
         private Item _currentItem;
         private Spawner _currentSpawner;
         private const float _spritePadding = .95f;
         private Vector2Int _gridPosition;
         private GridManager _gridManager;
+
+        public bool HasItem() => _currentItem != null;
+        public Item GetItem() => _currentItem;
+        public bool HasSpawner() => _currentSpawner != null;
+        public Spawner GetSpawner() => _currentSpawner;
+        public Vector2Int GridPosition => _gridPosition;
+
+        // True only when the tile has no item AND no spawner on it.
+        public bool IsEmpty => _currentSpawner == null && _currentItem == null;
 
         private void Awake()
         {
@@ -110,7 +111,7 @@ namespace MergeGame.Grid
                 _gridManager.MarkTileFree(_gridPosition);
             }
         }
-        
+
         private void PlaceObject(Transform objTransform, Vector3 localOffset)
         {
             objTransform.SetParent(transform);
@@ -141,7 +142,5 @@ namespace MergeGame.Grid
             sr.sortingLayerID = _renderer.sortingLayerID;
             sr.sortingOrder = _renderer.sortingOrder + 1;
         }
-
-        public Vector2Int GridPosition => _gridPosition;
     }
 }

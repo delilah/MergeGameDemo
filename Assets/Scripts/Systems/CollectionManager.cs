@@ -12,10 +12,6 @@ namespace MergeGame.Systems
     /// </summary>
     public class CollectionManager : MonoBehaviour
     {
-        public int TotalCollected { get; private set; }
-
-        private bool _gameOver;
-
         /// <summary>
         /// Event fired when an item is collected.
         /// Parameters: (MergeItemData itemData, int newCountForThatItem, Vector3 worldPosition)
@@ -35,6 +31,9 @@ namespace MergeGame.Systems
         private readonly Dictionary<string, MergeItemData> _registeredItems = new Dictionary<string, MergeItemData>();
 
         private GameConfig _gameConfig;
+        private bool _gameOver;
+
+        public int TotalCollected { get; private set; }
 
         [Inject]
         public void Construct(GameConfig gameConfig)
@@ -76,15 +75,6 @@ namespace MergeGame.Systems
             OnCollectionChanged?.Invoke();
 
             CheckWinCondition();
-        }
-
-        private void CheckWinCondition()
-        {
-            if (!_gameOver && TotalCollected >= _gameConfig.itemsToWin)
-            {
-                _gameOver = true;
-                OnWinConditionMet?.Invoke();
-            }
         }
 
         /// <summary>
@@ -131,6 +121,15 @@ namespace MergeGame.Systems
 #if UNITY_EDITOR
             Debug.Log("CollectionManager: All counts reset");
 #endif
+        }
+
+        private void CheckWinCondition()
+        {
+            if (!_gameOver && TotalCollected >= _gameConfig.itemsToWin)
+            {
+                _gameOver = true;
+                OnWinConditionMet?.Invoke();
+            }
         }
     }
 }

@@ -51,6 +51,14 @@ namespace MergeGame.Core
             }
         }
 
+        private void OnDestroy()
+        {
+            if (_collectionManager != null)
+            {
+                _collectionManager.OnWinConditionMet -= GameOver;
+            }
+        }
+
         /// <summary>
         /// Starts the game by loading the grid and placing the initial spawner.
         /// </summary>
@@ -95,14 +103,6 @@ namespace MergeGame.Core
         {
             _gridManager.SetGameObjectsActive(false);
             Debug.Log("Game Over!");
-        }
-
-        private void OnDestroy()
-        {
-            if (_collectionManager != null)
-            {
-                _collectionManager.OnWinConditionMet -= GameOver;
-            }
         }
     }
 }

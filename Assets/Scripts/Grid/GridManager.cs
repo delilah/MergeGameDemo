@@ -19,19 +19,16 @@ namespace MergeGame.Grid
         [SerializeField] private float _maxTileSize = 1.5f;
         [SerializeField] private float _minTileSize = 0.5f;
 
-        public Dictionary<Vector2Int, Tile> Tiles => _tiles;
-        public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
-
         private Dictionary<Vector2Int, Tile> _tiles;
         private GameObject _tilesParent;
-
-        private ObjectPool<Tile> _tilePool; // pooling
+        private ObjectPool<Tile> _tilePool;
         private List<Vector2Int> _freeTilePositions = new List<Vector2Int>();
-
         private float _tileSize;
         private Vector2 _startPos;
-
         private GameConfig _gameConfig;
+
+        public Dictionary<Vector2Int, Tile> Tiles => _tiles;
+        public IReadOnlyList<Vector2Int> FreeTilePositions => _freeTilePositions;
 
         [Inject]
         public void Construct(GameConfig gameConfig)
