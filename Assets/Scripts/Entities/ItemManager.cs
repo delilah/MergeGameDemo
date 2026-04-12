@@ -5,6 +5,7 @@ using Zenject;
 using MergeGame.Grid;
 using MergeGame.Systems;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Entities
 {
@@ -56,29 +57,20 @@ namespace MergeGame.Entities
         {
             if (_itemPrefab == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("No Item Prefab assigned!");
-                #endif
-                
+                DebugController.LogWarning("No Item Prefab assigned!");
                 return null;
             }
 
             Tile tile = _gridManager.GetTileAtPosition(gridPos);
             if (tile == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning($"No tile at {gridPos}");
-                #endif
-
+                DebugController.LogWarning($"No tile at {gridPos}");
                 return null;
             }
 
             if (tile.HasItem())
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning($"Tile at {gridPos} is already occupied");
-                #endif
-
+                DebugController.LogWarning($"Tile at {gridPos} is already occupied");
                 return null;
             }
 
@@ -99,28 +91,19 @@ namespace MergeGame.Entities
         {
             if (source == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("ItemManager: Cannot merge — source item is null.");
-                #endif
-
+                DebugController.LogWarning("ItemManager: Cannot merge: source item is null.");
                 return;
             }
 
             if (target == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("ItemManager: Cannot merge — target item is null.");
-                #endif
-
+                DebugController.LogWarning("ItemManager: Cannot merge: target item is null.");
                 return;
             }
 
             if (target.Data == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("ItemManager: Cannot merge — target item has no data.");
-                #endif
-
+                DebugController.LogWarning("ItemManager: Cannot merge: target item has no data.");
                 return;
             }
 
@@ -141,13 +124,9 @@ namespace MergeGame.Entities
             source.ReturnToPool();
 
             if (target.Data.nextItem != null)
-            {
                 target.Initialize(target.Data.nextItem, targetTile);
-            }
             else
-            {
                 target.SetTile(targetTile);
-            }
         }
 
         /// <summary>
@@ -158,19 +137,12 @@ namespace MergeGame.Entities
         {
             if (item == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("ItemManager: Cannot collect a null item.");
-                #endif
-
+                DebugController.LogWarning("ItemManager: Cannot collect a null item.");
                 return;
             }
 
             _collectionManager.Collect(item.Data, item.transform.position);
-
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"{item.Data.itemName} collected!");
-            #endif
-
+            DebugController.Log($"{item.Data.itemName} collected!");
             item.ReturnToPool();
         }
 

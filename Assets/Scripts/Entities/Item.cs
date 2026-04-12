@@ -4,6 +4,7 @@ using Zenject;
 using MergeGame.Grid;
 using MergeGame.Interfaces;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Entities
 {
@@ -67,10 +68,7 @@ namespace MergeGame.Entities
         {
             if (tile == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("Item: Cannot initialize with a null tile.");
-                #endif
-
+                DebugController.LogError("Item: Cannot initialize with a null tile.");
                 return;
             }
 
@@ -115,9 +113,7 @@ namespace MergeGame.Entities
             }
             else
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
-                #endif
+                DebugController.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
             }
         }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using Zenject;
 using MergeGame.Grid;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Entities
 {
@@ -31,19 +32,13 @@ namespace MergeGame.Entities
         {
             if (_spawnerPrefab == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("SpawnerManager: _spawnerPrefab is not assigned. Aborting spawner placement.");
-                #endif
-                
+                DebugController.LogError("SpawnerManager: _spawnerPrefab is not assigned. Aborting spawner placement.");                
                 return;
             }
 
             if (_initialSpawnerData == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("SpawnerManager: _initialSpawnerData is not assigned. Aborting spawner placement.");
-                #endif
-                
+                DebugController.LogError("SpawnerManager: _initialSpawnerData is not assigned. Aborting spawner placement.");                
                 return;
             }
 
@@ -52,19 +47,13 @@ namespace MergeGame.Entities
 
             if (tile == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("SpawnerManager: Tile does not exist!");
-                #endif
-
+                DebugController.LogWarning("SpawnerManager: Tile does not exist!");
                 return;
             }
 
             if (!tile.IsEmpty)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("SpawnerManager: Tile is occupied!");
-                #endif
-                
+                DebugController.LogWarning("SpawnerManager: Tile is occupied!");                
                 return;
             }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Data
 {
@@ -40,42 +41,42 @@ namespace MergeGame.Data
         {
             if (itemsToWin <= 0)
             {
-                Debug.LogWarning("GameConfig: itemsToWin should be greater than zero.");
+                DebugController.LogWarning("GameConfig: itemsToWin should be greater than zero.");
             }
 
             if (maxEnergy <= 0)
             {
-                Debug.LogWarning("GameConfig: maxEnergy should be greater than zero.");
+                DebugController.LogWarning("GameConfig: maxEnergy should be greater than zero.");
             }
 
             if (regenEnergyTime <= 0f)
             {
-                Debug.LogWarning("GameConfig: regenEnergyTime should be greater than zero.");
+                DebugController.LogWarning("GameConfig: regenEnergyTime should be greater than zero.");
             }
 
             if (sfx == null)
             {
-                Debug.LogWarning("GameConfig: sfx is not initialized.");
+                DebugController.LogWarning("GameConfig: sfx is not initialized.");
             }
 
             if (backgroundMusic == null)
             {
-                Debug.LogWarning("GameConfig: backgroundMusic is not assigned.");
+                DebugController.LogWarning("GameConfig: backgroundMusic is not assigned.");
             }
 
             if (musicVolume < 0f || musicVolume > 1f)
             {
-                Debug.LogWarning("GameConfig: musicVolume should be between 0 and 1.");
+                DebugController.LogWarning("GameConfig: musicVolume should be between 0 and 1.");
             }
 
             if (sfxVolume < 0f || sfxVolume > 1f)
             {
-                Debug.LogWarning("GameConfig: sfxVolume should be between 0 and 1.");
+                DebugController.LogWarning("GameConfig: sfxVolume should be between 0 and 1.");
             }
             
             if (catCollectionConfig == null)
             {
-                Debug.LogWarning("GameConfig: catCollectionConfig is not assigned.");
+                DebugController.LogWarning("GameConfig: catCollectionConfig is not assigned.");
             }
 
             

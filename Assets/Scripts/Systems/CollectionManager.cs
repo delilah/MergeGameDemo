@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Systems
 {
@@ -53,19 +54,13 @@ namespace MergeGame.Systems
 
             if (itemData == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("CollectionManager: Attempted to collect null item data");
-                #endif
-
+                DebugController.LogWarning("CollectionManager: Attempted to collect null item data");
                 return;
             }
 
             if (_gameConfig == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");
-                #endif
-                
+                DebugController.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");                
                 return;
             }
 
@@ -124,9 +119,7 @@ namespace MergeGame.Systems
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
 
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log("CollectionManager: All counts reset");
-            #endif
+            DebugController.Log("CollectionManager: All counts reset");
         }
 
         private void CheckWinCondition()

@@ -2,6 +2,7 @@
 using UnityEditor;
 #endif
 using UnityEngine;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Data
 {
@@ -34,17 +35,17 @@ namespace MergeGame.Data
 
             if (isFinal && nextItem != null)
             {
-                Debug.LogWarning($"MergeItemData '{itemName}': isFinal is true but nextItem is assigned. Clear nextItem or uncheck isFinal.");
+                DebugController.LogWarning($"MergeItemData '{itemName}': isFinal is true but nextItem is assigned. Clear nextItem or uncheck isFinal.");
             }
 
             if (level < 0)
             {
-                Debug.LogWarning($"MergeItemData '{itemName}': level should not be negative.");
+                DebugController.LogWarning($"MergeItemData '{itemName}': level should not be negative.");
             }
 
             if (string.IsNullOrEmpty(itemName))
             {
-                Debug.LogWarning($"MergeItemData on '{name}': itemName is empty.");
+                DebugController.LogWarning($"MergeItemData on '{name}': itemName is empty.");
             }
         }
 #endif

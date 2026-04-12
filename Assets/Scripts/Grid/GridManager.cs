@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Zenject;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 
 namespace MergeGame.Grid
@@ -61,19 +62,13 @@ namespace MergeGame.Grid
             Camera mainCam = Camera.main;
             if (mainCam == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("No MainCamera found. Make sure your camera is tagged as MainCamera");
-                #endif
-                
+                DebugController.LogError("No MainCamera found. Make sure your camera is tagged as MainCamera");
                 return false;
             }
 
             if (_tilePrefab == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("No tilePrefab assigned!");
-                #endif
-                
+                DebugController.LogWarning("No tilePrefab assigned!");
                 return false;
             }
 

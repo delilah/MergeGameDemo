@@ -5,6 +5,7 @@ using TMPro;
 using Zenject;
 using MergeGame.Systems;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.UI
 {
@@ -163,9 +164,7 @@ namespace MergeGame.UI
         private void ShowCollectionPopup(string message)
         {
             // TODO: Implement floating text, toast, or popup
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log($"[Popup] {message}");
-            #endif
+            DebugController.Log($"[Popup] {message}");
         }
     }
 }

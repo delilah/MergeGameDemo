@@ -6,6 +6,7 @@ using Zenject;
 using MergeGame.Grid;
 using MergeGame.Systems;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
 
 namespace MergeGame.Entities
 {
@@ -237,19 +238,13 @@ namespace MergeGame.Entities
         {
             if (_spawnerData == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("SpawnerData is null; cannot spawn.");
-                #endif
-
+                DebugController.LogWarning("SpawnerData is null; cannot spawn.");
                 return;
             }
 
             if (_isRecharging)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log("Spawner is recharging.");
-                #endif
-
+                DebugController.Log("Spawner is recharging.");
                 return;
             }
 
@@ -260,47 +255,32 @@ namespace MergeGame.Entities
 
             if (_itemManager == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("ItemManager not ready; cannot spawn.");
-                #endif
-
+                DebugController.LogWarning("ItemManager not ready; cannot spawn.");
                 return;
             }
 
             if (_spawnableCandidates.Count == 0)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("Spawner has no valid spawnable items.");
-                #endif
-
+                DebugController.LogWarning("Spawner has no valid spawnable items.");
                 return;
             }
 
             if (_gridManager == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogWarning("GridManager not ready; cannot spawn.");
-                #endif
-
+                DebugController.LogWarning("GridManager not ready; cannot spawn.");
                 return;
             }
 
             IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
             if (freeTiles.Count == 0)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log("No available tiles");
-                #endif
-
+                DebugController.Log("No available tiles");
                 return;
             }
 
             if (!_energyManager.TrySpendEnergy(EnergyManager.EnergyCost.Base))
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log("Not enough energy");
-                #endif
-
+                DebugController.Log("Not enough energy");
                 return;
             }
 
@@ -324,9 +304,7 @@ namespace MergeGame.Entities
                 _rechargeTimer = 0f;
                 StopIntroSpawnerAnimation();
 
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.Log("Spawner exhausted, recharging.");
-                #endif
+                DebugController.Log("Spawner exhausted, recharging.");
             }
         }
 

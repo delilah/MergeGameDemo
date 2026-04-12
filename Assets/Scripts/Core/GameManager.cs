@@ -6,6 +6,7 @@ using MergeGame.Grid;
 using MergeGame.Entities;
 using MergeGame.Data;
 using UnityEngine.InputSystem;
+using MergeGame.MergeDebug;
 
 
 namespace MergeGame.Core
@@ -64,7 +65,11 @@ namespace MergeGame.Core
         /// </summary>
         public void StartGame()
         {
-            if (!LoadGame()) return;
+            if (!LoadGame())
+            {
+                return;
+            }
+            
             _gridManager.SetGameObjectsActive(true);
             OnGameStarted?.Invoke();
         }
@@ -77,10 +82,7 @@ namespace MergeGame.Core
         {
             if (!_gridManager.GenerateGrid())
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("Failed to generate grid. Aborting game start.");
-                #endif
-                
+                DebugController.LogError("Failed to generate grid. Aborting game start.");
                 return false;
             }
 
@@ -106,9 +108,7 @@ namespace MergeGame.Core
         {
             _gridManager.SetGameObjectsActive(false);
 
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Debug.Log("Game Over!");
-            #endif
+            DebugController.Log("Game Over!");
         }
     }
 }

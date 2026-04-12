@@ -1,80 +1,45 @@
+using System.Diagnostics;
 using UnityEngine;
-
-// TODO: Update this file to be used in the project instead of #if UNITY_EDITOR || DEVELOPMENT_BUILD
-// This is an old version that needs to be updated
 
 namespace MergeGame.MergeDebug
 {
-    /// <summary>
-    /// Persistent debug controller. Add to a GameObject in your scene.
-    /// Provides a single toggle for all debug logs with automatic build exclusion.
-    /// </summary>
-
-    public class DebugController : MonoBehaviour
+    public static class DebugController
     {
-        private static DebugController _instance;
-        
-        [Header("Debug Settings")]
-        [SerializeField] 
-        [Tooltip("Enable/disable all debug logs in the game")]
-        private bool _enableDebugLogs = true;
-        
-        private void Awake()
+        public enum LogLevel { All, WarningsAndErrors, ErrorsOnly, None }
+
+        public static bool EnableLogs = true;
+        public static LogLevel Level = LogLevel.All;
+
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        public static void Log(string message)
         {
-            // Singleton pattern with DontDestroyOnLoad
-            if (_instance != null && _instance != this)
+            if (!EnableLogs || Level != LogLevel.All)
             {
-                Destroy(gameObject);
+                return;
+            }
+
+            UnityEngine.Debug.Log(message);
+        }
+
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        public static void LogWarning(string message)
+        {
+            if (!EnableLogs || Level > LogLevel.WarningsAndErrors)
+            {
+                return;
+            }
+
+            UnityEngine.Debug.LogWarning(message);
+        }
+
+        public static void LogError(string message)
+        {
+            if (!EnableLogs || Level > LogLevel.ErrorsOnly)
+            {
                 return;
             }
             
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        
-        /// <summary>
-        /// Replacement for Debug.Log - only logs if debug is enabled and not in release build
-        /// </summary>
-        public static void Log(string message)
-        {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (_instance != null && _instance._enableDebugLogs)
-            {
-                UnityEngine.Debug.Log(message);
-            }
-            #endif
-        }
-        
-        /// <summary>
-        /// Replacement for Debug.LogWarning - only logs if debug is enabled and not in release build
-        /// </summary>
-        public static void LogWarning(string message)
-        {
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (_instance != null && _instance._enableDebugLogs)
-            {
-                UnityEngine.Debug.LogWarning(message);
-            }
-            #endif
-        }
-        
-        /// <summary>
-        /// Replacement for Debug.LogError - always logs (errors should always be visible)
-        /// </summary>
-        public static void LogError(string message)
-        {
             UnityEngine.Debug.LogError(message);
-        }
-        
-        /// <summary>
-        /// Runtime toggle for debug logs
-        /// </summary>
-        public static void SetDebugEnabled(bool enabled)
-        {
-            if (_instance != null)
-            {
-                _instance._enableDebugLogs = enabled;
-            }
         }
     }
 }

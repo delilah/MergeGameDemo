@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using MergeGame.Core;
 using MergeGame.Systems;
 using MergeGame.Data;
+using MergeGame.MergeDebug;
+
  
 namespace MergeGame.UI
 {
@@ -79,16 +81,12 @@ namespace MergeGame.UI
         {
             if (_startButton == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("UIManager: _startButton is not assigned.");
-                #endif
+                DebugController.LogError("UIManager: _startButton is not assigned.");
             }
-            
+
             if (_playAgainButton == null)
             {
-                #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                Debug.LogError("UIManager: _playAgainButton is not assigned.");
-                #endif
+                DebugController.LogError("UIManager: _playAgainButton is not assigned.");
             }
             
             // Note: _gameManager and _collectionManager are guarded by Zenject against null
