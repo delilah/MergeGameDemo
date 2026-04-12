@@ -53,13 +53,19 @@ namespace MergeGame.Systems
 
             if (itemData == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("CollectionManager: Attempted to collect null item data");
+                #endif
+
                 return;
             }
 
             if (_gameConfig == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("CollectionManager: GameConfig is null. Cannot check if game is over.");
+                #endif
+                
                 return;
             }
 
@@ -118,9 +124,9 @@ namespace MergeGame.Systems
             TotalCollected = 0;
             OnCollectionChanged?.Invoke();
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log("CollectionManager: All counts reset");
-#endif
+            #endif
         }
 
         private void CheckWinCondition()

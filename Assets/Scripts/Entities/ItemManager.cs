@@ -56,20 +56,29 @@ namespace MergeGame.Entities
         {
             if (_itemPrefab == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("No Item Prefab assigned!");
+                #endif
+                
                 return null;
             }
 
             Tile tile = _gridManager.GetTileAtPosition(gridPos);
             if (tile == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning($"No tile at {gridPos}");
+                #endif
+
                 return null;
             }
 
             if (tile.HasItem())
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning($"Tile at {gridPos} is already occupied");
+                #endif
+
                 return null;
             }
 
@@ -90,19 +99,28 @@ namespace MergeGame.Entities
         {
             if (source == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("ItemManager: Cannot merge — source item is null.");
+                #endif
+
                 return;
             }
 
             if (target == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("ItemManager: Cannot merge — target item is null.");
+                #endif
+
                 return;
             }
 
             if (target.Data == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("ItemManager: Cannot merge — target item has no data.");
+                #endif
+
                 return;
             }
 
@@ -140,12 +158,19 @@ namespace MergeGame.Entities
         {
             if (item == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("ItemManager: Cannot collect a null item.");
+                #endif
+
                 return;
             }
 
             _collectionManager.Collect(item.Data, item.transform.position);
+
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log($"{item.Data.itemName} collected!");
+            #endif
+
             item.ReturnToPool();
         }
 

@@ -229,7 +229,7 @@ namespace MergeGame.Entities
             {
                 return;
             }
-            
+
             IntroSpawnerAnimation();
         }
 
@@ -237,13 +237,19 @@ namespace MergeGame.Entities
         {
             if (_spawnerData == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("SpawnerData is null; cannot spawn.");
+                #endif
+
                 return;
             }
 
             if (_isRecharging)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.Log("Spawner is recharging.");
+                #endif
+
                 return;
             }
 
@@ -254,32 +260,47 @@ namespace MergeGame.Entities
 
             if (_itemManager == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("ItemManager not ready; cannot spawn.");
+                #endif
+
                 return;
             }
 
             if (_spawnableCandidates.Count == 0)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("Spawner has no valid spawnable items.");
+                #endif
+
                 return;
             }
 
             if (_gridManager == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("GridManager not ready; cannot spawn.");
+                #endif
+
                 return;
             }
 
             IReadOnlyList<Vector2Int> freeTiles = _gridManager.FreeTilePositions;
             if (freeTiles.Count == 0)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.Log("No available tiles");
+                #endif
+
                 return;
             }
 
             if (!_energyManager.TrySpendEnergy(EnergyManager.EnergyCost.Base))
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.Log("Not enough energy");
+                #endif
+
                 return;
             }
 
@@ -302,7 +323,10 @@ namespace MergeGame.Entities
                 _isRecharging = true;
                 _rechargeTimer = 0f;
                 StopIntroSpawnerAnimation();
+
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.Log("Spawner exhausted, recharging.");
+                #endif
             }
         }
 

@@ -31,13 +31,19 @@ namespace MergeGame.Entities
         {
             if (_spawnerPrefab == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError("SpawnerManager: _spawnerPrefab is not assigned. Aborting spawner placement.");
+                #endif
+                
                 return;
             }
 
             if (_initialSpawnerData == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError("SpawnerManager: _initialSpawnerData is not assigned. Aborting spawner placement.");
+                #endif
+                
                 return;
             }
 
@@ -46,13 +52,19 @@ namespace MergeGame.Entities
 
             if (tile == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("SpawnerManager: Tile does not exist!");
+                #endif
+
                 return;
             }
 
             if (!tile.IsEmpty)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("SpawnerManager: Tile is occupied!");
+                #endif
+                
                 return;
             }
 

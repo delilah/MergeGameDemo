@@ -163,7 +163,9 @@ namespace MergeGame.UI
         private void ShowCollectionPopup(string message)
         {
             // TODO: Implement floating text, toast, or popup
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log($"[Popup] {message}");
+            #endif
         }
     }
 }

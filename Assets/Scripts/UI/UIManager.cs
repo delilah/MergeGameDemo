@@ -77,9 +77,20 @@ namespace MergeGame.UI
 
         private void Start()
         {
-            if (_startButton == null) Debug.LogError("UIManager: _startButton is not assigned.");
-            if (_playAgainButton == null) Debug.LogError("UIManager: _playAgainButton is not assigned.");
-
+            if (_startButton == null)
+            {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.LogError("UIManager: _startButton is not assigned.");
+                #endif
+            }
+            
+            if (_playAgainButton == null)
+            {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.LogError("UIManager: _playAgainButton is not assigned.");
+                #endif
+            }
+            
             // Note: _gameManager and _collectionManager are guarded by Zenject against null
             _gameManager.OnGameStarted += ShowGame;
             _gameManager.OnPlayAgain += ShowIntro;

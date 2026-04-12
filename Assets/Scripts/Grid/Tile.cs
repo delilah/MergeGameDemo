@@ -57,7 +57,10 @@ namespace MergeGame.Grid
         {
             if (spawner == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("Spawner is null, cannot place.");
+                #endif
+
                 return;
             }
 
@@ -79,7 +82,10 @@ namespace MergeGame.Grid
         {
             if (_gridManager == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError($"GridManager is null on tile {name}: was SetGridPosition called?");
+                #endif
+                
                 return;
             }
 
@@ -99,7 +105,10 @@ namespace MergeGame.Grid
         {
             if (_gridManager == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError($"GridManager is null on tile {name}: was SetGridPosition called?");
+                #endif
+                
                 return;
             }
 

@@ -1,5 +1,8 @@
 using UnityEngine;
 
+// TODO: Update this file to be used in the project instead of #if UNITY_EDITOR || DEVELOPMENT_BUILD
+// This is an old version that needs to be updated
+
 namespace MergeGame.MergeDebug
 {
     /// <summary>

@@ -61,13 +61,19 @@ namespace MergeGame.Grid
             Camera mainCam = Camera.main;
             if (mainCam == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError("No MainCamera found. Make sure your camera is tagged as MainCamera");
+                #endif
+                
                 return false;
             }
 
             if (_tilePrefab == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("No tilePrefab assigned!");
+                #endif
+                
                 return false;
             }
 

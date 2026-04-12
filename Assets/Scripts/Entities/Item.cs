@@ -67,7 +67,10 @@ namespace MergeGame.Entities
         {
             if (tile == null)
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError("Item: Cannot initialize with a null tile.");
+                #endif
+
                 return;
             }
 
@@ -112,7 +115,9 @@ namespace MergeGame.Entities
             }
             else
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.Log($"Non-final item clicked: {name} (Data: {_data.name}, next: {_data.nextItem?.name})");
+                #endif
             }
         }
 

@@ -77,7 +77,10 @@ namespace MergeGame.Core
         {
             if (!_gridManager.GenerateGrid())
             {
+                #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogError("Failed to generate grid. Aborting game start.");
+                #endif
+                
                 return false;
             }
 
@@ -102,7 +105,10 @@ namespace MergeGame.Core
         public void GameOver()
         {
             _gridManager.SetGameObjectsActive(false);
+
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log("Game Over!");
+            #endif
         }
     }
 }
