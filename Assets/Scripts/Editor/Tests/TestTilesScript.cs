@@ -66,17 +66,8 @@ public class TestTilesScript
         _itemManager = itemManagerGo.AddComponent<ItemManager>();
         _toCleanup.Add(itemManagerGo);
         
-        // Manual injection BEFORE Unity calls Awake
-        var imGridField = typeof(ItemManager).GetField("_gridManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        imGridField?.SetValue(_itemManager, _gridManager);
-        var imAudioField = typeof(ItemManager).GetField("_audioManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        imAudioField?.SetValue(_itemManager, _audioManager);
-        var imCollectionField = typeof(ItemManager).GetField("_collectionManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        imCollectionField?.SetValue(_itemManager, _collectionManager);
-        var imContainerField = typeof(ItemManager).GetField("_container", BindingFlags.NonPublic | BindingFlags.Instance);
-        imContainerField?.SetValue(_itemManager, null); // Not used in tests
-        var imGameConfigField = typeof(ItemManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
-        imGameConfigField?.SetValue(_itemManager, _gameConfig);
+        // Use Zenject injection
+        _itemManager.Construct(_gridManager, null, _audioManager, _collectionManager, _gameConfig);
 
         // Re-enable GameObjects before calling Awake
         gridManagerGo.SetActive(true);
