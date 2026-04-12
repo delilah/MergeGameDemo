@@ -24,15 +24,13 @@ public class TestTilesScript
         // Create GameConfig
         _gameConfig = Register(ScriptableObject.CreateInstance<GameConfig>());
 
-        // Create GridManager and inject BEFORE Awake()
+        // Create GridManager and inject
         var gridManagerGo = new GameObject("GridManager");
         gridManagerGo.SetActive(false); // Disable to prevent Awake()
         _gridManager = gridManagerGo.AddComponent<GridManager>();
         _toCleanup.Add(gridManagerGo);
         
-        // Manual injection BEFORE Unity calls Awake
-        var gridConfigField = typeof(GridManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
-        gridConfigField?.SetValue(_gridManager, _gameConfig);
+        _gridManager.Construct(_gameConfig);
 
         // Create CollectionManager and inject
         var collectionManagerGo = new GameObject("CollectionManager");
@@ -40,8 +38,7 @@ public class TestTilesScript
         _collectionManager = collectionManagerGo.AddComponent<CollectionManager>();
         _toCleanup.Add(collectionManagerGo);
         
-        var collectionConfigField = typeof(CollectionManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
-        collectionConfigField?.SetValue(_collectionManager, _gameConfig);
+        _collectionManager.Construct(_gameConfig);
 
         // Create AudioManager and inject
         var audioManagerGo = new GameObject("AudioManager");
@@ -49,10 +46,9 @@ public class TestTilesScript
         var sfxSource = audioManagerGo.AddComponent<AudioSource>();
         var musicSource = audioManagerGo.AddComponent<AudioSource>();
         
-        var audioConfigField = typeof(AudioManager).GetField("_config", BindingFlags.NonPublic | BindingFlags.Instance);
-        audioConfigField?.SetValue(_audioManager, _gameConfig);
-        var audioCollectionField = typeof(AudioManager).GetField("_collectionManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        audioCollectionField?.SetValue(_audioManager, _collectionManager);
+        _audioManager.Construct(_gameConfig, _collectionManager);
+        
+        // Set AudioSource components (still need reflection for these as they're not in Construct)
         var sfxSourceField = typeof(AudioManager).GetField("_sfxSource", BindingFlags.NonPublic | BindingFlags.Instance);
         sfxSourceField?.SetValue(_audioManager, sfxSource);
         var musicSourceField = typeof(AudioManager).GetField("_musicSource", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -66,7 +62,6 @@ public class TestTilesScript
         _itemManager = itemManagerGo.AddComponent<ItemManager>();
         _toCleanup.Add(itemManagerGo);
         
-        // Use Zenject injection
         _itemManager.Construct(_gridManager, null, _audioManager, _collectionManager, _gameConfig);
 
         // Re-enable GameObjects before calling Awake
@@ -154,9 +149,7 @@ public class TestTilesScript
         rendererField.SetValue(tile, tileRenderer);
 
         go.transform.position = position;
-
-        // Required: set grid position and gridManager reference so Tile internals work
-        tile.SetGridPosition(gridPos, _gridManager);
+        tile.SetGridPosition(gridPos, _gridManager); 
 
         return tile;
     }
@@ -169,10 +162,7 @@ public class TestTilesScript
 
         var item = go.AddComponent<Item>();
 
-        var gridManagerField = typeof(Item).GetField("_gridManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        gridManagerField?.SetValue(item, _gridManager);
-        var itemManagerField = typeof(Item).GetField("_itemManager", BindingFlags.NonPublic | BindingFlags.Instance);
-        itemManagerField?.SetValue(item, _itemManager);
+        item.Construct(_gridManager, _itemManager, _gameConfig);
 
         item.Initialize(data, tile);
         return item;
