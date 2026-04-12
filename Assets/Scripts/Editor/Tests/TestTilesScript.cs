@@ -18,6 +18,12 @@ public class TestTilesScript
     private ItemManager _itemManager;
     private GameConfig _gameConfig;
 
+    // naming
+    private const string GridManagerName = "GridManager";
+    private const string CollectionManagerName = "CollectionManager";
+    private const string AudioManagerName = "AudioManager";
+    private const string ItemManagerName = "ItemManager";
+
     [SetUp]
     public void SetUp()
     {
@@ -25,7 +31,7 @@ public class TestTilesScript
         _gameConfig = Register(ScriptableObject.CreateInstance<GameConfig>());
 
         // Create GridManager and inject
-        var gridManagerGo = new GameObject("GridManager");
+        var gridManagerGo = new GameObject(GridManagerName);
         gridManagerGo.SetActive(false); // Disable to prevent Awake()
         _gridManager = gridManagerGo.AddComponent<GridManager>();
         _toCleanup.Add(gridManagerGo);
@@ -33,7 +39,7 @@ public class TestTilesScript
         _gridManager.Construct(_gameConfig);
 
         // Create CollectionManager and inject
-        var collectionManagerGo = new GameObject("CollectionManager");
+        var collectionManagerGo = new GameObject(CollectionManagerName);
         collectionManagerGo.SetActive(false); // Disable to prevent Awake()
         _collectionManager = collectionManagerGo.AddComponent<CollectionManager>();
         _toCleanup.Add(collectionManagerGo);
@@ -41,7 +47,7 @@ public class TestTilesScript
         _collectionManager.Construct(_gameConfig);
 
         // Create AudioManager and inject
-        var audioManagerGo = new GameObject("AudioManager");
+        var audioManagerGo = new GameObject(AudioManagerName);
         _audioManager = audioManagerGo.AddComponent<AudioManager>();
         var sfxSource = audioManagerGo.AddComponent<AudioSource>();
         var musicSource = audioManagerGo.AddComponent<AudioSource>();
@@ -57,7 +63,7 @@ public class TestTilesScript
         _toCleanup.Add(audioManagerGo);
 
         // Create ItemManager and inject BEFORE Awake()
-        var itemManagerGo = new GameObject("ItemManager");
+        var itemManagerGo = new GameObject(ItemManagerName);
         itemManagerGo.SetActive(false); // Disable to prevent Awake()
         _itemManager = itemManagerGo.AddComponent<ItemManager>();
         _toCleanup.Add(itemManagerGo);
