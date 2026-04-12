@@ -23,13 +23,10 @@ public class TestTilesScript
     {
         // Create GameConfig
         _gameConfig = Register(ScriptableObject.CreateInstance<GameConfig>());
-        _gameConfig.itemsToWin = 10;
-
-        // Initialize SfxConfig to prevent null reference in AudioManager
-        _gameConfig.sfx = new SfxConfig();
 
         // Create GridManager and inject BEFORE Awake()
         var gridManagerGo = new GameObject("GridManager");
+        gridManagerGo.SetActive(false); // Disable to prevent Awake()
         _gridManager = gridManagerGo.AddComponent<GridManager>();
         _toCleanup.Add(gridManagerGo);
         
@@ -39,6 +36,7 @@ public class TestTilesScript
 
         // Create CollectionManager and inject
         var collectionManagerGo = new GameObject("CollectionManager");
+        collectionManagerGo.SetActive(false); // Disable to prevent Awake()
         _collectionManager = collectionManagerGo.AddComponent<CollectionManager>();
         _toCleanup.Add(collectionManagerGo);
         
@@ -64,6 +62,7 @@ public class TestTilesScript
 
         // Create ItemManager and inject BEFORE Awake()
         var itemManagerGo = new GameObject("ItemManager");
+        itemManagerGo.SetActive(false); // Disable to prevent Awake()
         _itemManager = itemManagerGo.AddComponent<ItemManager>();
         _toCleanup.Add(itemManagerGo);
         
@@ -79,6 +78,11 @@ public class TestTilesScript
         var imGameConfigField = typeof(ItemManager).GetField("_gameConfig", BindingFlags.NonPublic | BindingFlags.Instance);
         imGameConfigField?.SetValue(_itemManager, _gameConfig);
 
+        // Re-enable GameObjects before calling Awake
+        gridManagerGo.SetActive(true);
+        collectionManagerGo.SetActive(true);
+        itemManagerGo.SetActive(true);
+        
         // Now manually call Awake after injection is complete
         var gridAwakeMethod = typeof(GridManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
         gridAwakeMethod?.Invoke(_gridManager, null);
