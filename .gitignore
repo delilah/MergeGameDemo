@@ -101,3 +101,5 @@ InitTestScene*.unity*
 /DOCS
 PROJECT_NOTES.md
 ProfilerCaptures
+Assets/_Recovery
+Assets/_Recovery.meta
