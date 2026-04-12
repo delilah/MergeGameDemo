@@ -39,7 +39,9 @@ namespace MergeGame.Grid
             _gameConfig = gameConfig;
         }
 
-        private void Awake()
+        private void Awake() => Initialize();
+
+        public void Initialize()
         {
             _tilesParent = new GameObject(_gameConfig.tilesParentName);
 

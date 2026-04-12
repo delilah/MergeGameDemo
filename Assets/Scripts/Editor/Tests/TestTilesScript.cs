@@ -64,17 +64,14 @@ public class TestTilesScript
         
         _itemManager.Construct(_gridManager, null, _audioManager, _collectionManager, _gameConfig);
 
-        // Re-enable GameObjects before calling Awake
+        // Re-enable GameObjects before calling Initialize
         gridManagerGo.SetActive(true);
         collectionManagerGo.SetActive(true);
         itemManagerGo.SetActive(true);
-        
-        // Now manually call Awake after injection is complete
-        var gridAwakeMethod = typeof(GridManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
-        gridAwakeMethod?.Invoke(_gridManager, null);
-        
-        var itemAwakeMethod = typeof(ItemManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance);
-        itemAwakeMethod?.Invoke(_itemManager, null);
+
+        // Call Initialize() directly after injection instead of relying on Awake()
+        _gridManager.Initialize();
+        _itemManager.Initialize();
     }
 
     [TearDown]
@@ -142,15 +139,10 @@ public class TestTilesScript
     private Tile CreateTile(string name, Vector3 position, Vector2Int gridPos)
     {
         var go = Register(new GameObject(name));
-        var tile = go.AddComponent<Tile>();
-
-        var tileRenderer = go.AddComponent<SpriteRenderer>();
-        var rendererField = typeof(Tile).GetField("_renderer", BindingFlags.NonPublic | BindingFlags.Instance);
-        rendererField.SetValue(tile, tileRenderer);
-
+        go.AddComponent<SpriteRenderer>(); // picked up by Tile.Awake via GetComponent
+        var tile = go.AddComponent<Tile>(); // Awake fires here, _renderer auto-resolved
         go.transform.position = position;
-        tile.SetGridPosition(gridPos, _gridManager); 
-
+        tile.SetGridPosition(gridPos, _gridManager);
         return tile;
     }
 

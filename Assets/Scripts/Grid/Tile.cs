@@ -29,6 +29,12 @@ namespace MergeGame.Grid
         private Vector2Int _gridPosition;
         private GridManager _gridManager;
 
+        private void Awake()
+        {
+            if (_renderer == null)
+                _renderer = GetComponent<SpriteRenderer>();
+        }
+
         public void Init(bool isAlternateTile)
         {
             _renderer.color = isAlternateTile ? _offsetColor : _baseColor;

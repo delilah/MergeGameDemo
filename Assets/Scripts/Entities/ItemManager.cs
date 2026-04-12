@@ -32,7 +32,9 @@ namespace MergeGame.Entities
             _gameConfig = gameConfig;
         }
 
-        private void Awake()
+        private void Awake() => Initialize();
+
+        public void Initialize()
         {
             _itemsParent = new GameObject(_gameConfig.itemsParentName);
 
