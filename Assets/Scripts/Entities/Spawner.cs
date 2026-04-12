@@ -139,10 +139,12 @@ namespace MergeGame.Entities
         {
             _baseScale = transform.localScale;
 
-            if (_playIntroAnimation)
+            if (!_playIntroAnimation)
             {
-                IntroSpawnerAnimation();
+                return;
             }
+
+            IntroSpawnerAnimation();
         }
 
         public void IntroSpawnerAnimation()
@@ -223,10 +225,12 @@ namespace MergeGame.Entities
 
         private void OnEnergyRestored()
         {
-            if (!_isRecharging)
+            if (_isRecharging)
             {
-                IntroSpawnerAnimation();
+                return;
             }
+            
+            IntroSpawnerAnimation();
         }
 
         private void TrySpawn()

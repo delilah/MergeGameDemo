@@ -18,6 +18,8 @@ namespace MergeGame.Grid
         [Header("Tile Size Constraints")]
         [SerializeField] private float _maxTileSize = 1.5f;
         [SerializeField] private float _minTileSize = 0.5f;
+        [SerializeField] [Range(0f, 1f)] private float _gridScreenCoverage = 0.9f;
+
 
         private Dictionary<Vector2Int, Tile> _tiles;
         private GameObject _tilesParent;
@@ -94,8 +96,8 @@ namespace MergeGame.Grid
             float screenHeight = mainCam.orthographicSize * 2f;
             float screenWidth = screenHeight * mainCam.aspect;
 
-            float tileSize = Mathf.Min((screenWidth * 0.9f) / _width,
-                                    (screenHeight * 0.9f) / _height);
+            float tileSize = Mathf.Min((screenWidth * _gridScreenCoverage) / _width,
+                                    (screenHeight * _gridScreenCoverage) / _height);
             tileSize = Mathf.Clamp(tileSize, _minTileSize, _maxTileSize);
 
             float gridWidth = _width * tileSize;

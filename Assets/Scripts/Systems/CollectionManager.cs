@@ -125,11 +125,13 @@ namespace MergeGame.Systems
 
         private void CheckWinCondition()
         {
-            if (!_gameOver && TotalCollected >= _gameConfig.itemsToWin)
+            if (_gameOver || TotalCollected < _gameConfig.itemsToWin)
             {
-                _gameOver = true;
-                OnWinConditionMet?.Invoke();
+                return;
             }
+
+            _gameOver = true;
+            OnWinConditionMet?.Invoke();
         }
     }
 }
