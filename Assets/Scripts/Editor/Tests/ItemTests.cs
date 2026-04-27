@@ -41,9 +41,9 @@ public class ItemTests : MergeGameTestBase
         bool merged = item1.OnDrop(tile2);
 
         Assert.IsTrue(merged, "OnDrop should report a successful merge");
-        Assert.AreEqual(level2, item2.Data, "Target item should have been upgraded to level2");
-        Assert.AreEqual(item2, tile2.GetItem(), "Tile2 should still reference the original target item");
-        Assert.IsFalse(tile1.HasItem(), "Tile1 should no longer have an item after merge");
+        Assert.AreEqual(level2, item2.Data, $"Target item should have been upgraded to {Level2Name}");
+        Assert.AreEqual(item2, tile2.GetItem(), $"{Tile2Name} should still reference the original target item");
+        Assert.IsFalse(tile1.HasItem(), $"{Tile1Name} should no longer have an item after merge");
     }
 
     [Test]
@@ -68,8 +68,8 @@ public class ItemTests : MergeGameTestBase
         bool result = item1.OnDrop(tile2);
 
         Assert.IsFalse(result);
-        Assert.AreEqual(item1, tile1.GetItem(), "Tile1 should still have item1");
-        Assert.AreEqual(item2, tile2.GetItem(), "Tile2 should still have item2");
+        Assert.AreEqual(item1, tile1.GetItem(), $"{Tile1Name} should still have item1");
+        Assert.AreEqual(item2, tile2.GetItem(), $"{Tile2Name} should still have item2");
     }
 
     [Test]
@@ -85,7 +85,7 @@ public class ItemTests : MergeGameTestBase
         bool result = item1.OnDrop(tile1);
 
         Assert.IsFalse(result);
-        Assert.AreEqual(item1, tile1.GetItem(), "Tile1 should still have item1");
+        Assert.AreEqual(item1, tile1.GetItem(), $"{Tile1Name} should still have item1");
     }
 
     [Test]
@@ -103,8 +103,8 @@ public class ItemTests : MergeGameTestBase
         bool result = item1.OnDrop(tile2);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(item1, tile2.GetItem(), "Tile2 should now have item1");
-        Assert.IsFalse(tile1.HasItem(), "Tile1 should be empty after move");
+        Assert.AreEqual(item1, tile2.GetItem(), $"{Tile2Name} should now have item1");
+        Assert.IsFalse(tile1.HasItem(), $"{Tile1Name} should be empty after move");
     }
 
     [Test]
@@ -127,8 +127,8 @@ public class ItemTests : MergeGameTestBase
 
         Assert.IsTrue(result);
         Assert.AreEqual(maxLevel, item2.Data, "Target item should still have max level data");
-        Assert.AreEqual(item2, tile2.GetItem(), "Tile2 should still have item2");
-        Assert.IsFalse(tile1.HasItem(), "Tile1 should be empty after merge");
+        Assert.AreEqual(item2, tile2.GetItem(), $"{Tile2Name} should still have item2");
+        Assert.IsFalse(tile1.HasItem(), $"{Tile1Name} should be empty after merge");
     }
 
     [Test]
@@ -162,15 +162,15 @@ public class ItemTests : MergeGameTestBase
 
         // --- Act & Assert: first merge level1 + level1 -> level2 ---
         item1.OnDrop(tile2);
-        Assert.AreEqual(level2, item2.Data, "First merge should produce level2");
+        Assert.AreEqual(level2, item2.Data, $"First merge should produce {Level2Name}");
 
         // --- Act & Assert: second merge level2 + level2 -> level3 ---
         item2.OnDrop(tile3);
-        Assert.AreEqual(level3, item3.Data, "Second merge should produce level3");
+        Assert.AreEqual(level3, item3.Data, $"Second merge should produce {Level3Name}");
 
         // --- Assert: tile state ---
-        Assert.IsFalse(tile1.HasItem(), "Tile1 should be empty");
-        Assert.IsFalse(tile2.HasItem(), "Tile2 should be empty");
-        Assert.AreEqual(item3, tile3.GetItem(), "Tile3 should have the final item");
+        Assert.IsFalse(tile1.HasItem(), $"{Tile1Name} should be empty");
+        Assert.IsFalse(tile2.HasItem(), $"{Tile2Name} should be empty");
+        Assert.AreEqual(item3, tile3.GetItem(), $"{Tile3Name} should have the final item");
     }
 }
