@@ -61,7 +61,7 @@ Game settings can be adjusted via ScriptableObjects:
 
 ## Technologies Used
 
-- **Unity 2022.3 LTS**: Game engine
+- **Unity 6.3 LTS**: Game engine
 - **C#**: Programming language
 - **Universal Render Pipeline (URP)**: Rendering pipeline
 - **TextMeshPro**: UI text rendering
@@ -86,7 +86,6 @@ Game settings can be adjusted via ScriptableObjects:
 - UI Improvements
 - Multiple Spawners
 - Levels
-- More Tests
 
 ## CREDITS
 ### Icons
