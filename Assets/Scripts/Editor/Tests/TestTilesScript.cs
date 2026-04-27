@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -49,17 +48,7 @@ public class TestTilesScript
         // Create AudioManager and inject
         var audioManagerGo = new GameObject(AudioManagerName);
         _audioManager = audioManagerGo.AddComponent<AudioManager>();
-        var sfxSource = audioManagerGo.AddComponent<AudioSource>();
-        var musicSource = audioManagerGo.AddComponent<AudioSource>();
-        
         _audioManager.Construct(_gameConfig, _collectionManager);
-        
-        // Set AudioSource components (still need reflection for these as they're not in Construct)
-        var sfxSourceField = typeof(AudioManager).GetField("_sfxSource", BindingFlags.NonPublic | BindingFlags.Instance);
-        sfxSourceField?.SetValue(_audioManager, sfxSource);
-        var musicSourceField = typeof(AudioManager).GetField("_musicSource", BindingFlags.NonPublic | BindingFlags.Instance);
-        musicSourceField?.SetValue(_audioManager, musicSource);
-        
         _toCleanup.Add(audioManagerGo);
 
         // Create ItemManager and inject BEFORE Awake()
